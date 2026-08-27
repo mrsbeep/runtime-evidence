@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 
-const requiredPaths = [
+const requiredPaths: readonly string[] = [
   '.github/ISSUE_TEMPLATE/bug.yml',
   '.github/ISSUE_TEMPLATE/feature.yml',
   '.github/pull_request_template.md',
@@ -32,9 +32,14 @@ const requiredPaths = [
   'packages/reporter-junit/README.md',
   'packages/plugin-sdk/README.md',
   'schemas/README.md',
+  'scripts/check-scaffold.ts',
 ];
 
-const missing = [];
+const missing: string[] = [];
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 for (const path of requiredPaths) {
   try {
@@ -48,7 +53,7 @@ for (const path of ['package.json', '.prettierrc.json', 'tsconfig.base.json']) {
   try {
     JSON.parse(await readFile(path, 'utf8'));
   } catch (error) {
-    console.error(`Invalid JSON in ${path}: ${error.message}`);
+    console.error(`Invalid JSON in ${path}: ${getErrorMessage(error)}`);
     process.exitCode = 1;
   }
 }
