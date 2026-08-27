@@ -52,6 +52,7 @@ export const ScenarioSchemaV1 = Type.Object(
     id: Type.String({ pattern: '^[a-z0-9][a-z0-9._-]*$' }),
     name: NonEmptyString,
     description: Type.Optional(NonEmptyString),
+    tags: Type.Optional(Type.Array(NonEmptyString, { uniqueItems: true })),
     provenance: Provenance,
     safety: Safety,
     request: Request,
