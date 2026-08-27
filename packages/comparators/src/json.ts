@@ -208,7 +208,7 @@ export function compareBody(
     const validityDifference = difference(
       'json.validity',
       '/response/body',
-      'A response declared as JSON contains invalid JSON.',
+      'JSON comparison is required, but at least one response body is not valid JSON.',
       { valid: baselineJson.valid },
       { valid: candidateJson.valid },
     );

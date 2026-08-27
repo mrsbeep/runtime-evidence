@@ -1,7 +1,7 @@
 import type { HttpObservation } from '@runtime-evidence/replay-http';
 
 import type { NormalizedComparisonPolicy } from './json-path.ts';
-import { difference, result, type ComparatorResult } from './types.ts';
+import { difference, result, type ComparisonDifference, type ComparatorResult } from './types.ts';
 
 export function compareLatency(
   baseline: HttpObservation,
@@ -13,7 +13,7 @@ export function compareLatency(
     return result([]);
   }
 
-  const differences = [];
+  const differences: ComparisonDifference[] = [];
   const relativeLimitMs = baseline.latencyMs * (policy.maxLatencyRegressionPercent / 100);
   if (regressionMs > relativeLimitMs) {
     differences.push(
