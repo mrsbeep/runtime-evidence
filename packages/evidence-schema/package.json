@@ -5,6 +5,9 @@
   "description": "Canonical evidence types and validation for runtime-evidence",
   "license": "Apache-2.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate": "node src/generate.ts && biome format --write ../../schemas/config-v1.json ../../schemas/scenario-v1.json ../../schemas/evidence-v1.json",
