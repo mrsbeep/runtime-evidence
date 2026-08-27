@@ -1,2 +1,17 @@
-/** Package identity used while the reviewed public API is still being designed. */
-export const packageName = '@runtime-evidence/cli' as const;
+export { CliExitCodes, exitCodeForStatus } from './exit-codes.ts';
+export { CLI_VERSION } from './invocation.ts';
+export { runCli } from './run.ts';
+export {
+  type CliCommandContext,
+  type CliCommandHandler,
+  type CliCommandName,
+  CliCommandNames,
+  type CliCommandResult,
+  type CliDiagnostic,
+  type CliExitCode,
+  type CliIo,
+  type CliOutputEnvelope,
+  type CliRunOptions,
+  type CliRunResult,
+  type CliStatus,
+} from './types.ts';

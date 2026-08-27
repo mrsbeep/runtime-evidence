@@ -5,11 +5,24 @@
   "description": "Command-line interface for runtime-evidence",
   "license": "Apache-2.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "runtime-evidence": "./dist/bin.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/cli.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
     "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@runtime-evidence/config": "0.0.0",
+    "@runtime-evidence/evidence-schema": "0.0.0",
+    "@runtime-evidence/reporter-junit": "0.0.0",
+    "@runtime-evidence/reporter-markdown": "0.0.0"
   }
 }
