@@ -10,11 +10,12 @@ Thank you for helping build `runtime-evidence`. The project is early, so an issu
 
 ## Development workflow
 
-1. Fork the repository and create a branch from `main`.
-2. Make the smallest coherent change.
-3. Add or update tests and documentation when implementation exists.
-4. Run `npm run check`.
-5. Open a pull request using the repository template.
+1. Fork the repository and create a branch from `v0.1`.
+2. Install the locked development dependencies with `npm ci`.
+3. Make the smallest coherent change.
+4. Add or update tests and documentation when implementation exists.
+5. Run `npm run check`.
+6. Open a pull request using the repository template.
 
 Package-specific commands will be documented in each package as implementation begins.
 

@@ -9,10 +9,23 @@
     "packages/*"
   ],
   "scripts": {
-    "check": "node scripts/check-scaffold.ts"
+    "build": "npm run clean && npm run build --workspaces --if-present",
+    "check": "npm run check:scaffold && npm run format:check && npm run lint && npm run typecheck && npm run build && npm test",
+    "check:scaffold": "node scripts/check-scaffold.ts",
+    "clean": "node scripts/clean.ts",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present",
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present"
   },
   "engines": {
     "node": ">=22.18.0",
     "npm": ">=10"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.10",
+    "@types/node": "22.20.1",
+    "typescript": "7.0.2"
   }
 }

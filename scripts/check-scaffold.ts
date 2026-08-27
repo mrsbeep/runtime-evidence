@@ -1,10 +1,24 @@
 import { access, readFile } from 'node:fs/promises';
 
+const workspacePackages: readonly string[] = [
+  'capture-http',
+  'cli',
+  'comparators',
+  'config',
+  'evidence-schema',
+  'orchestrator',
+  'plugin-sdk',
+  'replay-http',
+  'reporter-junit',
+  'reporter-markdown',
+];
+
 const requiredPaths: readonly string[] = [
   '.github/ISSUE_TEMPLATE/bug.yml',
   '.github/ISSUE_TEMPLATE/feature.yml',
   '.github/pull_request_template.md',
   '.github/workflows/ci.yml',
+  '.npmrc',
   'CHANGELOG.md',
   'CODE_OF_CONDUCT.md',
   'CONTRIBUTING.md',
@@ -14,6 +28,7 @@ const requiredPaths: readonly string[] = [
   'ROADMAP.md',
   'SECURITY.md',
   'SUPPORT.md',
+  'biome.json',
   'docs/concepts/README.md',
   'docs/guides/README.md',
   'docs/reference/README.md',
@@ -31,8 +46,17 @@ const requiredPaths: readonly string[] = [
   'packages/reporter-markdown/README.md',
   'packages/reporter-junit/README.md',
   'packages/plugin-sdk/README.md',
+  'package-lock.json',
   'schemas/README.md',
+  'scripts/clean.ts',
   'scripts/check-scaffold.ts',
+  'tests/workspace.test.ts',
+  'tsconfig.json',
+  ...workspacePackages.flatMap((packageName) => [
+    `packages/${packageName}/package.json`,
+    `packages/${packageName}/src/index.ts`,
+    `packages/${packageName}/tsconfig.json`,
+  ]),
 ];
 
 const missing: string[] = [];
@@ -49,7 +73,18 @@ for (const path of requiredPaths) {
   }
 }
 
-for (const path of ['package.json', '.prettierrc.json', 'tsconfig.base.json']) {
+const jsonPaths = [
+  'biome.json',
+  'package.json',
+  'tsconfig.base.json',
+  'tsconfig.json',
+  ...workspacePackages.flatMap((packageName) => [
+    `packages/${packageName}/package.json`,
+    `packages/${packageName}/tsconfig.json`,
+  ]),
+];
+
+for (const path of jsonPaths) {
   try {
     JSON.parse(await readFile(path, 'utf8'));
   } catch (error) {

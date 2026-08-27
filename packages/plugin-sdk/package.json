@@ -1,0 +1,15 @@
+{
+  "name": "@runtime-evidence/plugin-sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Plugin contracts and helpers for runtime-evidence",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
