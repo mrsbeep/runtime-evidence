@@ -1,2 +1,5 @@
-/** Package identity used while the reviewed public API is still being designed. */
-export const packageName = '@runtime-evidence/reporter-markdown' as const;
+export {
+  MARKDOWN_REPORT_FILE_NAME,
+  renderMarkdownEvidence,
+  renderMarkdownEvidenceFile,
+} from './render.ts';

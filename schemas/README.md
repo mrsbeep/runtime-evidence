@@ -24,3 +24,10 @@ narrows an accepted value, or changes semantics requires a new schema file and `
 
 Old schema files remain published so stored evidence can still be interpreted. Migrations must be
 explicit and preserve the original artifact when exact reconstruction is not possible.
+
+## Evidence integrity
+
+The v1 evidence digest is lowercase SHA-256 over compact canonical JSON of the artifact without its
+top-level `integrity` field. Canonical JSON sorts object keys by code unit at every depth, preserves
+array order, and accepts only finite, acyclic JSON values. The stored artifact itself uses the same
+canonical serialization and ends with one newline.
