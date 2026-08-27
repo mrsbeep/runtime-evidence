@@ -83,9 +83,11 @@ export class ScenarioHookError extends Error {
   }
 }
 
-export class ScenarioLifecycleError extends Error {
+export class ScenarioLifecycleError<Result = unknown> extends Error {
   readonly cleanupFailures: readonly ScenarioHookFailureSummary[];
   readonly code: ScenarioDiagnosticCode;
+  /** Operation output retained after cleanup failure; deliberately omitted from JSON diagnostics. */
+  readonly operationResult: Result | undefined;
   readonly phase: ScenarioLifecyclePhase;
   readonly primaryFailure: ScenarioHookFailureSummary | undefined;
 
@@ -96,11 +98,13 @@ export class ScenarioLifecycleError extends Error {
     cleanupFailures: readonly ScenarioHookFailureSummary[],
     primaryFailure: ScenarioHookFailureSummary | undefined,
     cause?: unknown,
+    operationResult?: Result,
   ) {
     super(message, { cause });
     this.name = 'ScenarioLifecycleError';
     this.cleanupFailures = cleanupFailures;
     this.code = code;
+    this.operationResult = operationResult;
     this.phase = phase;
     this.primaryFailure = primaryFailure;
   }
@@ -452,13 +456,14 @@ export async function runScenarioLifecycle<Result>(
   }
 
   if (cleanupFailures.length > 0) {
-    throw new ScenarioLifecycleError(
+    throw new ScenarioLifecycleError<Result>(
       'SCENARIO_CLEANUP_FAILED',
       'Scenario operation completed, but cleanup did not.',
       'cleanup',
       cleanupFailures,
       undefined,
       cleanupErrors[0],
+      result,
     );
   }
 

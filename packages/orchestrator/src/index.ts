@@ -23,4 +23,15 @@ export {
   type LoadScenariosOptions,
   loadScenarios,
 } from './scenario-loader.ts';
+export {
+  type VerificationFailure,
+  type VerificationFailureCode,
+  type VerificationFailureKind,
+  type VerificationFailurePhase,
+  VerificationFailureCodes,
+  type VerificationOwnFailureCode,
+  type VerificationResult,
+  type VerifyScenarioOptions,
+} from './verification-types.ts';
+export { verifyScenario } from './verification.ts';
 export { ScenarioSchemaV1, type ScenarioV1 } from '@runtime-evidence/evidence-schema';

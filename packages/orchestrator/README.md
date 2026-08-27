@@ -39,3 +39,19 @@ Every declared cleanup hook is attempted after success, failure, timeout, or int
 does not inherit the caller's aborted signal, so it still gets an opportunity to restore state.
 Scenario authors must make cleanup commands idempotent and must not daemonize or detach child
 processes.
+
+## Baseline and candidate verification
+
+`verifyScenario` prepares one validated scenario request and executes it concurrently against the
+configured baseline and candidate. It applies connection startup and request timeouts from the
+validated configuration plus an explicit total verification timeout. Setup and cleanup remain part
+of the same lifecycle.
+
+The result contains typed baseline and candidate observations or a stable failure for each missing
+observation. Target availability, setup, timeout, interruption, cleanup, and transport failures are
+distinguishable. Any failure makes the result `incomplete`; execution only reports `complete` and
+never reports `pass`. Pass/fail is reserved for the deterministic comparison stage.
+
+Target hosts must appear in `network.allowHosts`, and state-changing scenarios fail closed until a
+later policy layer can grant them explicitly. Response bodies are runtime-only unsanitized data and
+must pass through redaction before any persistence or logging.
