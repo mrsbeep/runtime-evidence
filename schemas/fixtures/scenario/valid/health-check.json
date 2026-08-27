@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "id": "health-check",
   "name": "Health check",
+  "tags": ["smoke", "readiness"],
   "provenance": {
     "source": "hand-authored",
     "reference": "examples/node-http/scenarios/health-check.json"
