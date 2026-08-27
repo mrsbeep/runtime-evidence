@@ -78,6 +78,7 @@ test('discovers a parent config, applies safe defaults, and resolves references'
   assert.deepEqual(loaded.config.timeouts, { connectMs: 1_000, requestMs: 10_000 });
   assert.deepEqual(loaded.config.comparison, {
     ignoredJsonPaths: [],
+    normalizedJsonPaths: [],
     maxLatencyRegressionPercent: 20,
   });
   assert.match(loaded.configHash, /^[a-f0-9]{64}$/);

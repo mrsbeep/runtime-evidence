@@ -13,5 +13,6 @@ UTF-8 or base64 body, and measured latency. Failures are typed as target, timeou
 interruption outcomes and never include URLs, headers, bodies, or underlying error text.
 
 Response bodies default to a 1 MiB limit. Sensitive response headers are never captured even if
-selected. Target URLs must be HTTP or HTTPS origins and cannot contain credentials, paths, query
+selected. Content type is always captured so downstream body comparison has an explicit media-type
+contract. Target URLs must be HTTP or HTTPS origins and cannot contain credentials, paths, query
 parameters, or fragments.

@@ -32,6 +32,7 @@ export const CONFIG_DEFAULTS_V1 = Object.freeze({
   }),
   comparison: Object.freeze({
     ignoredJsonPaths: Object.freeze([]),
+    normalizedJsonPaths: Object.freeze([]),
     maxLatencyRegressionPercent: 20,
   }),
 });

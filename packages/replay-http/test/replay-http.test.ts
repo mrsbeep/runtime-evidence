@@ -95,7 +95,7 @@ test('captures a typed local observation and omits sensitive response headers', 
     {
       connectTimeoutMs: 500,
       requestTimeoutMs: 500,
-      selectedResponseHeaders: ['content-type', 'set-cookie', 'x-observed'],
+      selectedResponseHeaders: ['set-cookie', 'x-observed'],
     },
   );
 
@@ -105,6 +105,9 @@ test('captures a typed local observation and omits sensitive response headers', 
   }
   assert.equal(outcome.observation.target.revision, 'baseline-sha');
   assert.equal(outcome.observation.response.statusCode, 201);
+  assert.deepEqual(outcome.observation.response.headers['content-type'], [
+    'application/json; charset=utf-8',
+  ]);
   assert.deepEqual(outcome.observation.response.headers['x-observed'], ['yes']);
   assert.equal(outcome.observation.response.headers['set-cookie'], undefined);
   assert.deepEqual(outcome.observation.response.body, {

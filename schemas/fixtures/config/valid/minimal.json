@@ -35,6 +35,8 @@
   },
   "comparison": {
     "ignoredJsonPaths": ["$.requestId"],
+    "normalizedJsonPaths": ["$.generatedAt"],
+    "maxLatencyRegressionMs": 250,
     "maxLatencyRegressionPercent": 20
   }
 }
