@@ -21,7 +21,8 @@ function escapeHtml(value: string): string {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll("'", '&#39;')
+    .replaceAll('|', '&#124;');
 }
 
 function normalizeText(value: string): string {

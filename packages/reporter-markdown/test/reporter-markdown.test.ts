@@ -76,3 +76,17 @@ test('replaces control characters that could corrupt Markdown presentation', () 
   assert.equal(report.includes(String.fromCodePoint(0)), false);
   assert.equal(report.includes('checkout\uFFFDapi'), true);
 });
+
+test('encodes table delimiters in scenario identifiers', () => {
+  const payload = mixedEvidencePayload();
+  const firstResult = payload.results[0];
+  assert.ok(firstResult);
+  const artifact = createEvidenceArtifact({
+    ...payload,
+    results: [{ ...firstResult, scenarioId: 'status|regression' }, ...payload.results.slice(1)],
+  });
+  const report = renderMarkdownEvidence(artifact);
+
+  assert.match(report, /<code>status&#124;regression<\/code>/);
+  assert.doesNotMatch(report, /<code>status\|regression<\/code>/);
+});
