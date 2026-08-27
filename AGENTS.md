@@ -70,6 +70,9 @@ and run the schema tests.
 - Follow the shared strict compiler settings in `tsconfig.base.json`.
 - Let Biome own formatting. Use two-space indentation, single-quoted TypeScript strings, and
   semicolons.
+- Write production-grade modular code: keep modules cohesive, public interfaces narrow,
+  dependencies explicit, and orchestration separate from domain logic. Split responsibilities when
+  they diverge, but do not add abstractions without a concrete need.
 - Keep public types and runtime validation derived from the same contract where practical.
 - Use stable diagnostic codes and safe field paths; never include secret values in errors.
 - Make hashes, comparisons, reports, fixtures, and tests deterministic across platforms and
