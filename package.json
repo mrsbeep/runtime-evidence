@@ -15,6 +15,7 @@
     "clean": "node scripts/clean.ts",
     "format": "biome format --write .",
     "format:check": "biome format .",
+    "generate:schemas": "npm run generate --workspace @runtime-evidence/evidence-schema",
     "lint": "biome lint .",
     "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present",
     "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present"

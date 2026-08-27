@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "checkout-api"
+  },
+  "targets": {
+    "baseline": {
+      "url": "http://127.0.0.1:4100"
+    },
+    "candidate": {
+      "url": {
+        "env": "CANDIDATE_URL"
+      },
+      "headers": {
+        "authorization": {
+          "env": "CANDIDATE_TOKEN"
+        }
+      }
+    }
+  },
+  "scenarios": {
+    "include": ["health-check"]
+  },
+  "network": {
+    "default": "deny",
+    "allowHosts": ["127.0.0.1"]
+  },
+  "redaction": {
+    "headers": ["authorization", "cookie", "set-cookie"],
+    "jsonPaths": ["$.token"]
+  },
+  "timeouts": {
+    "connectMs": 1000,
+    "requestMs": 5000
+  },
+  "comparison": {
+    "ignoredJsonPaths": ["$.requestId"],
+    "maxLatencyRegressionPercent": 20
+  }
+}

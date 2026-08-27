@@ -1,0 +1,239 @@
+{
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "toolVersion",
+    "runId",
+    "createdAt",
+    "project",
+    "state",
+    "config",
+    "targets",
+    "results",
+    "coverage",
+    "limitations",
+    "skippedChecks",
+    "infrastructureErrors",
+    "redaction",
+    "integrity"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "toolVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "enum": ["pass", "fail", "incomplete", "advisory"]
+    },
+    "config": {
+      "type": "object",
+      "required": ["schemaVersion", "sha256"],
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "object",
+      "required": ["baseline", "candidate"],
+      "properties": {
+        "baseline": {
+          "type": "object",
+          "required": ["name", "url"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "candidate": {
+          "type": "object",
+          "required": ["name", "url"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scenarioId", "state", "durationMs", "differences"],
+        "properties": {
+          "scenarioId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "enum": ["pass", "fail", "incomplete", "advisory"]
+          },
+          "durationMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "differences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["comparator", "path", "severity", "message"],
+              "properties": {
+                "comparator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "severity": {
+                  "enum": ["info", "warning", "error"]
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "baseline": {},
+                "candidate": {}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["scenariosSelected", "scenariosCompleted", "assertionsEvaluated"],
+      "properties": {
+        "scenariosSelected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scenariosCompleted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assertionsEvaluated": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "skippedChecks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check", "reason"],
+        "properties": {
+          "check": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "infrastructureErrors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "required": ["applied", "rules", "valuesRemoved"],
+      "properties": {
+        "applied": {
+          "type": "boolean"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "valuesRemoved": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["algorithm", "digest"],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Digest of the canonical evidence payload as defined by the evidence writer."
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:runtime-evidence:schema:evidence:v1",
+  "title": "Runtime Evidence artifact, version 1",
+  "description": "A reviewable record of a baseline-to-candidate runtime verification run.",
+  "additionalProperties": false
+}

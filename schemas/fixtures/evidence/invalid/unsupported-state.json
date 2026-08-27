@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "toolVersion": "0.1.0",
+  "runId": "run-2026-08-27-002",
+  "createdAt": "2026-08-27T14:10:00Z",
+  "project": "checkout-api",
+  "state": "unknown",
+  "config": {
+    "schemaVersion": 1,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "targets": {
+    "baseline": {
+      "name": "baseline",
+      "url": "http://127.0.0.1:4100"
+    },
+    "candidate": {
+      "name": "candidate",
+      "url": "http://127.0.0.1:4200"
+    }
+  },
+  "results": [],
+  "coverage": {
+    "scenariosSelected": 0,
+    "scenariosCompleted": 0,
+    "assertionsEvaluated": 0
+  },
+  "limitations": [],
+  "skippedChecks": [],
+  "infrastructureErrors": [],
+  "redaction": {
+    "applied": false,
+    "rules": [],
+    "valuesRemoved": 0
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

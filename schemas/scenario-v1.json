@@ -1,0 +1,202 @@
+{
+  "type": "object",
+  "required": ["schemaVersion", "id", "name", "provenance", "safety", "request"],
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "enum": ["hand-authored", "har", "openapi", "local-capture", "test-adapter"]
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "safety": {
+      "type": "object",
+      "required": ["classification", "rationale"],
+      "properties": {
+        "classification": {
+          "enum": ["safe", "mocked", "read-only", "state-changing"]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": ["method", "path"],
+      "properties": {
+        "method": {
+          "enum": ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "headers": {
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "required": ["env"],
+                  "properties": {
+                    "env": {
+                      "type": "string",
+                      "pattern": "^[A-Z_][A-Z0-9_]*$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "A reference to an environment variable; the secret value is never stored."
+                }
+              ]
+            }
+          }
+        },
+        "query": {
+          "type": "object",
+          "patternProperties": {
+            "^.*$": {
+              "type": "string"
+            }
+          }
+        },
+        "body": {}
+      },
+      "additionalProperties": false
+    },
+    "setup": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "args", "timeoutMs"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "required": ["env"],
+                    "properties": {
+                      "env": {
+                        "type": "string",
+                        "pattern": "^[A-Z_][A-Z0-9_]*$"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "A reference to an environment variable; the secret value is never stored."
+                  }
+                ]
+              }
+            }
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "cleanup": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "args", "timeoutMs"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "required": ["env"],
+                    "properties": {
+                      "env": {
+                        "type": "string",
+                        "pattern": "^[A-Z_][A-Z0-9_]*$"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "A reference to an environment variable; the secret value is never stored."
+                  }
+                ]
+              }
+            }
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:runtime-evidence:schema:scenario:v1",
+  "title": "Runtime Evidence scenario, version 1",
+  "description": "A replayable request scenario with explicit origin and safety classification.",
+  "additionalProperties": false
+}
