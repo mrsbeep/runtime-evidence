@@ -32,6 +32,7 @@ preserved because it may affect execution order.
 - Sensitive header redaction includes authorization, cookies, proxy authorization, and API keys.
 - Connect and request timeouts default to 1,000 ms and 10,000 ms.
 - Ignored JSON paths default to none; the latency regression limit defaults to 20 percent.
+- Normalized JSON paths default to none; an absolute latency limit is disabled unless configured.
 
 Failures throw `ConfigLoadError` with a stable `CONFIG_*` code and field-level diagnostics. YAML
 uses the YAML 1.2 JSON schema, rejects duplicate keys, merge keys, custom tags, aliases, unsafe

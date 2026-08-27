@@ -27,7 +27,7 @@ const sensitiveResponseHeaders = new Set([
 export function normalizeSelectedResponseHeaders(
   headers: readonly string[] | undefined,
 ): readonly string[] {
-  const selected = new Set<string>();
+  const selected = new Set<string>(['content-type']);
   for (const header of headers ?? defaultSelectedResponseHeaders) {
     const normalized = header.toLowerCase();
     try {

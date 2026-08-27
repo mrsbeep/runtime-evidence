@@ -53,6 +53,8 @@ const Timeouts = Type.Object(
 const ComparisonPolicy = Type.Object(
   {
     ignoredJsonPaths: Type.Array(NonEmptyString, { uniqueItems: true }),
+    normalizedJsonPaths: Type.Optional(Type.Array(NonEmptyString, { uniqueItems: true })),
+    maxLatencyRegressionMs: Type.Optional(Type.Number({ minimum: 0 })),
     maxLatencyRegressionPercent: Type.Number({ minimum: 0 }),
   },
   { additionalProperties: false },

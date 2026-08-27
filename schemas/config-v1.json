@@ -227,6 +227,18 @@
           },
           "uniqueItems": true
         },
+        "normalizedJsonPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "maxLatencyRegressionMs": {
+          "type": "number",
+          "minimum": 0
+        },
         "maxLatencyRegressionPercent": {
           "type": "number",
           "minimum": 0
