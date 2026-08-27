@@ -18,6 +18,7 @@ evidence.xml
 .env.*
 !.env.example
 *.local
+CLAUDE.local.md
 
 # Local workspace leftovers
 /.workspace
