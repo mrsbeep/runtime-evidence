@@ -9,10 +9,10 @@
     "packages/*"
   ],
   "scripts": {
-    "check": "node scripts/check-scaffold.mjs"
+    "check": "node scripts/check-scaffold.ts"
   },
   "engines": {
-    "node": ">=22",
+    "node": ">=22.18.0",
     "npm": ">=10"
   }
 }

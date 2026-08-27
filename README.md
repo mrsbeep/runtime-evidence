@@ -32,7 +32,7 @@ Each area contains a short README describing its intended scope. Package APIs an
 
 Requirements:
 
-- Node.js 22 or newer
+- Node.js 22.18 or newer
 - npm 10 or newer
 
 Validate the repository scaffold:
