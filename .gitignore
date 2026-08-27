@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build and test output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Runtime Evidence output
+.runtime-evidence/
+evidence.json
+evidence.md
+evidence.xml
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Local workspace leftovers
+/.workspace
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
