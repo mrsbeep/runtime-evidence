@@ -35,13 +35,25 @@ Requirements:
 - Node.js 22.18 or newer
 - npm 10 or newer
 
-Validate the repository scaffold:
+Install and validate the workspace:
 
 ```sh
+npm ci
 npm run check
 ```
 
-No install step is needed for the initial structural check. Build, lint, and test commands will be added with the first implementation packages.
+Useful commands:
+
+| Command | Purpose |
+|---|---|
+| `npm run build` | Compile every workspace package |
+| `npm run typecheck` | Type-check repository tooling and packages |
+| `npm run lint` | Lint TypeScript and supported project files with Biome |
+| `npm run format` | Format supported files with Biome |
+| `npm test` | Run repository and package tests |
+| `npm run clean` | Remove generated package output |
+
+Workspace packages remain private until their public APIs are implemented and reviewed.
 
 ## Contributing
 
