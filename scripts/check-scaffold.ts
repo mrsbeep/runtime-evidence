@@ -14,15 +14,19 @@ const workspacePackages: readonly string[] = [
 ];
 
 const requiredPaths: readonly string[] = [
+  '.github/copilot-instructions.md',
   '.github/ISSUE_TEMPLATE/bug.yml',
   '.github/ISSUE_TEMPLATE/feature.yml',
   '.github/pull_request_template.md',
   '.github/workflows/ci.yml',
   '.npmrc',
+  'AGENTS.md',
   'CHANGELOG.md',
+  'CLAUDE.md',
   'CODE_OF_CONDUCT.md',
   'CONTRIBUTING.md',
   'GOVERNANCE.md',
+  'GEMINI.md',
   'LICENSE',
   'README.md',
   'ROADMAP.md',
@@ -30,6 +34,7 @@ const requiredPaths: readonly string[] = [
   'SUPPORT.md',
   'biome.json',
   'docs/concepts/README.md',
+  'docs/agents/README.md',
   'docs/guides/README.md',
   'docs/reference/README.md',
   'docs/security/README.md',
