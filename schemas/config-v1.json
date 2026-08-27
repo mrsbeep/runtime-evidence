@@ -1,0 +1,243 @@
+{
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "project",
+    "targets",
+    "scenarios",
+    "network",
+    "redaction",
+    "timeouts",
+    "comparison"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "object",
+      "required": ["baseline", "candidate"],
+      "properties": {
+        "baseline": {
+          "type": "object",
+          "required": ["url"],
+          "properties": {
+            "url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "required": ["env"],
+                  "properties": {
+                    "env": {
+                      "type": "string",
+                      "pattern": "^[A-Z_][A-Z0-9_]*$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "A reference to an environment variable; the secret value is never stored."
+                }
+              ]
+            },
+            "headers": {
+              "type": "object",
+              "patternProperties": {
+                "^.*$": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "required": ["env"],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Z_][A-Z0-9_]*$"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "A reference to an environment variable; the secret value is never stored."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "candidate": {
+          "type": "object",
+          "required": ["url"],
+          "properties": {
+            "url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "required": ["env"],
+                  "properties": {
+                    "env": {
+                      "type": "string",
+                      "pattern": "^[A-Z_][A-Z0-9_]*$"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "A reference to an environment variable; the secret value is never stored."
+                }
+              ]
+            },
+            "headers": {
+              "type": "object",
+              "patternProperties": {
+                "^.*$": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "required": ["env"],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Z_][A-Z0-9_]*$"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "A reference to an environment variable; the secret value is never stored."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "scenarios": {
+      "type": "object",
+      "required": ["include"],
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "network": {
+      "type": "object",
+      "required": ["default", "allowHosts"],
+      "properties": {
+        "default": {
+          "type": "string",
+          "const": "deny"
+        },
+        "allowHosts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Outbound network policy. Version 1 always fails closed by default."
+    },
+    "redaction": {
+      "type": "object",
+      "required": ["headers", "jsonPaths"],
+      "properties": {
+        "headers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "jsonPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "timeouts": {
+      "type": "object",
+      "required": ["connectMs", "requestMs"],
+      "properties": {
+        "connectMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requestMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "required": ["ignoredJsonPaths", "maxLatencyRegressionPercent"],
+      "properties": {
+        "ignoredJsonPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "maxLatencyRegressionPercent": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:runtime-evidence:schema:config:v1",
+  "title": "Runtime Evidence configuration, version 1",
+  "description": "Configuration for one deterministic baseline-to-candidate verification run.",
+  "additionalProperties": false
+}

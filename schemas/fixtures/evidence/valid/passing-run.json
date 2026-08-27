@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "toolVersion": "0.1.0",
+  "runId": "run-2026-08-27-001",
+  "createdAt": "2026-08-27T14:05:00Z",
+  "project": "checkout-api",
+  "state": "pass",
+  "config": {
+    "schemaVersion": 1,
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "targets": {
+    "baseline": {
+      "name": "baseline",
+      "url": "http://127.0.0.1:4100"
+    },
+    "candidate": {
+      "name": "candidate",
+      "url": "http://127.0.0.1:4200"
+    }
+  },
+  "results": [
+    {
+      "scenarioId": "health-check",
+      "state": "pass",
+      "durationMs": 31.4,
+      "differences": []
+    }
+  ],
+  "coverage": {
+    "scenariosSelected": 1,
+    "scenariosCompleted": 1,
+    "assertionsEvaluated": 3
+  },
+  "limitations": [],
+  "skippedChecks": [],
+  "infrastructureErrors": [],
+  "redaction": {
+    "applied": true,
+    "rules": ["header:authorization", "jsonpath:$.token"],
+    "valuesRemoved": 1
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

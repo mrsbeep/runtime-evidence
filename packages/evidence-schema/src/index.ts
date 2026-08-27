@@ -1,2 +1,3 @@
-/** Package identity used while the reviewed public API is still being designed. */
-export const packageName = '@runtime-evidence/evidence-schema' as const;
+export { ConfigSchemaV1, type ConfigV1 } from './config.ts';
+export { EvidenceSchemaV1, type EvidenceV1 } from './evidence.ts';
+export { ScenarioSchemaV1, type ScenarioV1 } from './scenario.ts';

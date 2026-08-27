@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "health-check",
+  "name": "Health check",
+  "provenance": {
+    "source": "hand-authored",
+    "reference": "examples/node-http/scenarios/health-check.json"
+  },
+  "safety": {
+    "classification": "read-only",
+    "rationale": "The endpoint only reports service readiness."
+  },
+  "request": {
+    "method": "GET",
+    "path": "/health",
+    "headers": {
+      "accept": "application/json"
+    }
+  }
+}

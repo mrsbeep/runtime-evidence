@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "health-check",
+  "name": "Health check",
+  "provenance": {
+    "source": "hand-authored"
+  },
+  "request": {
+    "method": "GET",
+    "path": "/health"
+  }
+}

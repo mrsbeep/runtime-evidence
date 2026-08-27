@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "checkout-api"
+  },
+  "targets": {
+    "baseline": {
+      "url": "http://127.0.0.1:4100"
+    },
+    "candidate": {
+      "url": "http://127.0.0.1:4200"
+    }
+  },
+  "scenarios": {
+    "include": ["health-check"]
+  },
+  "network": {
+    "default": "deny",
+    "allowHosts": ["127.0.0.1"],
+    "allowEverything": true
+  },
+  "redaction": {
+    "headers": [],
+    "jsonPaths": []
+  },
+  "timeouts": {
+    "connectMs": 1000,
+    "requestMs": 5000
+  },
+  "comparison": {
+    "ignoredJsonPaths": [],
+    "maxLatencyRegressionPercent": 20
+  }
+}
