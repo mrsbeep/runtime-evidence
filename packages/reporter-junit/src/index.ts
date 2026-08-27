@@ -1,2 +1,5 @@
-/** Package identity used while the reviewed public API is still being designed. */
-export const packageName = '@runtime-evidence/reporter-junit' as const;
+export {
+  JUNIT_REPORT_FILE_NAME,
+  renderJUnitEvidence,
+  renderJUnitEvidenceFile,
+} from './render.ts';

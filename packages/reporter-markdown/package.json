@@ -5,11 +5,18 @@
   "description": "Markdown evidence reporter for runtime-evidence",
   "license": "Apache-2.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/reporter-markdown.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
     "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@runtime-evidence/evidence-schema": "0.0.0"
   }
 }

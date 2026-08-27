@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate": "node src/generate.ts && biome format --write ../../schemas/config-v1.json ../../schemas/scenario-v1.json ../../schemas/evidence-v1.json",
-    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/schemas.test.ts",
+    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/schemas.test.ts test/artifact.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
