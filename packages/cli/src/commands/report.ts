@@ -69,6 +69,8 @@ export const reportCommand: CliCommandHandler = async (context) => {
     if (error instanceof EvidenceArtifactError) {
       return artifactFailure(error);
     }
-    return infrastructureResult('CLI_REPORT_WRITE_FAILED', 'Evidence report could not be written.');
+    return requestedOutput === undefined
+      ? infrastructureResult('CLI_REPORT_RENDER_FAILED', 'Evidence report could not be rendered.')
+      : infrastructureResult('CLI_REPORT_WRITE_FAILED', 'Evidence report could not be written.');
   }
 };

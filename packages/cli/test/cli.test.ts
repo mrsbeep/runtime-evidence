@@ -15,6 +15,7 @@ import {
   type CliCommandHandler,
   type CliIo,
   type CliOutputEnvelope,
+  type CliRunOptions,
   type CliStatus,
   runCli,
 } from '../src/index.ts';
@@ -65,6 +66,23 @@ test('root and every v0.1 command expose help', async () => {
     assert.match(harness.stdout.join(''), /Usage:/);
     assert.equal(harness.stderr.join(''), '');
   }
+});
+
+test('JSON help and version envelopes include their requested content', async () => {
+  const helpHarness = createHarness();
+  await runCli(['--help', '--json'], { io: helpHarness.io });
+  assert.match((parseOnlyEnvelope(helpHarness).data as { text: string }).text, /Usage:/);
+
+  const commandHelpHarness = createHarness();
+  await runCli(['doctor', '--help', '--json'], { io: commandHelpHarness.io });
+  assert.equal(
+    (parseOnlyEnvelope(commandHelpHarness).data as { command: string }).command,
+    'doctor',
+  );
+
+  const versionHarness = createHarness();
+  await runCli(['--version', '--json'], { io: versionHarness.io });
+  assert.equal((parseOnlyEnvelope(versionHarness).data as { version: string }).version, '0.0.0');
 });
 
 test('JSON mode keeps its single envelope separate from progress', async () => {
@@ -156,6 +174,15 @@ test('an interrupted command can never report success', async () => {
   assert.equal(parseOnlyEnvelope(harness).code, 'CLI_INTERRUPTED');
 });
 
+test('an invalid runtime handler override fails closed', async () => {
+  const harness = createHarness();
+  const handlers = { doctor: undefined } as unknown as NonNullable<CliRunOptions['handlers']>;
+  const result = await runCli(['doctor', '--json'], { handlers, io: harness.io });
+
+  assert.equal(result.exitCode, 4);
+  assert.equal(parseOnlyEnvelope(harness).code, 'CLI_HANDLER_UNAVAILABLE');
+});
+
 test('capture and verify fail closed until their enforcement dependencies land', async () => {
   for (const command of ['capture', 'verify'] as const) {
     const harness = createHarness();
@@ -187,6 +214,17 @@ test('init creates a valid fail-closed config and refuses accidental replacement
   });
   assert.equal(repeated.exitCode, 2);
   assert.equal(parseOnlyEnvelope(secondHarness).code, 'CLI_CONFIG_EXISTS');
+
+  const forceHarness = createHarness();
+  const replaced = await runCli(
+    ['init', '--yes', '--force', '--project', 'replacement', '--directory', directory, '--json'],
+    { cwd: directory, io: forceHarness.io },
+  );
+  assert.equal(replaced.exitCode, 0);
+  assert.equal(
+    (await loadConfig({ startDirectory: directory })).config.project.name,
+    'replacement',
+  );
 });
 
 test('doctor returns safe config metadata without resolved target values', async (context) => {
@@ -221,6 +259,7 @@ test('report validates canonical evidence and renders CI output', async (context
   const reportPath = join(directory, 'evidence.junit.xml');
   const evidence = createEvidenceArtifact(mixedEvidencePayload());
   await writeFile(evidencePath, serializeEvidenceArtifact(evidence), 'utf8');
+  await writeFile(reportPath, 'stale report', 'utf8');
 
   const harness = createHarness();
   const result = await runCli(

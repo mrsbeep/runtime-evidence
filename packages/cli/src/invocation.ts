@@ -22,8 +22,26 @@ export type CliInvocation =
       readonly result: CliCommandResult;
     };
 
-function successfulOutput(code: string, message: string, humanOutput: string): CliCommandResult {
-  return { code, humanOutput, message, status: 'success' };
+function successfulOutput(
+  code: string,
+  message: string,
+  humanOutput: string,
+  data: Readonly<Record<string, unknown>>,
+): CliCommandResult {
+  return { code, data, humanOutput, message, status: 'success' };
+}
+
+function rootHelpResult(): CliCommandResult {
+  const text = rootHelp();
+  return successfulOutput('CLI_HELP', 'Root help emitted.', text, { text });
+}
+
+function commandHelpResult(definition: CliCommandDefinition): CliCommandResult {
+  const text = commandHelp(definition);
+  return successfulOutput('CLI_HELP', `Help for ${definition.name} emitted.`, text, {
+    command: definition.name,
+    text,
+  });
 }
 
 function extractGlobalJson(arguments_: readonly string[]): {
@@ -68,7 +86,7 @@ export function parseInvocation(arguments_: readonly string[]): CliInvocation {
       command: null,
       json: extracted.json,
       kind: 'result',
-      result: successfulOutput('CLI_HELP', 'Root help emitted.', rootHelp()),
+      result: rootHelpResult(),
     };
   }
   if (first === '--version') {
@@ -83,7 +101,9 @@ export function parseInvocation(arguments_: readonly string[]): CliInvocation {
       command: null,
       json: extracted.json,
       kind: 'result',
-      result: successfulOutput('CLI_VERSION', 'CLI version emitted.', CLI_VERSION),
+      result: successfulOutput('CLI_VERSION', 'CLI version emitted.', CLI_VERSION, {
+        version: CLI_VERSION,
+      }),
     };
   }
   if (first === 'help') {
@@ -92,7 +112,7 @@ export function parseInvocation(arguments_: readonly string[]): CliInvocation {
         command: null,
         json: extracted.json,
         kind: 'result',
-        result: successfulOutput('CLI_HELP', 'Root help emitted.', rootHelp()),
+        result: rootHelpResult(),
       };
     }
     const [requested, ...extra] = rest;
@@ -111,11 +131,7 @@ export function parseInvocation(arguments_: readonly string[]): CliInvocation {
       command: definition.name,
       json: extracted.json,
       kind: 'result',
-      result: successfulOutput(
-        'CLI_HELP',
-        `Help for ${definition.name} emitted.`,
-        commandHelp(definition),
-      ),
+      result: commandHelpResult(definition),
     };
   }
 
@@ -128,11 +144,7 @@ export function parseInvocation(arguments_: readonly string[]): CliInvocation {
       command: definition.name,
       json: extracted.json,
       kind: 'result',
-      result: successfulOutput(
-        'CLI_HELP',
-        `Help for ${definition.name} emitted.`,
-        commandHelp(definition),
-      ),
+      result: commandHelpResult(definition),
     };
   }
   return {

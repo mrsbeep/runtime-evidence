@@ -57,6 +57,14 @@ export async function runCli(
     const signal = options.signal ?? new AbortController().signal;
     const handlers = { ...commandHandlers(), ...options.handlers };
     const handler = handlers[invocation.command];
+    if (typeof handler !== 'function') {
+      return emitResult(
+        command,
+        json,
+        infrastructureResult('CLI_HANDLER_UNAVAILABLE', 'Command handler is unavailable.'),
+        io,
+      );
+    }
     const result = await handler({
       command: invocation.command,
       cwd: options.cwd ?? processCwd(),
