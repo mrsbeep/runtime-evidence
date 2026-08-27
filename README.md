@@ -26,7 +26,7 @@ schemas/    Versioned configuration, scenario, and evidence schemas
 scripts/    Repository maintenance and validation scripts
 ```
 
-Each area contains a short README describing its intended scope. Package APIs and schemas will be added as their designs are accepted.
+Each area contains a short README describing its intended scope. Package APIs and schemas will be added as their designs are accepted. See the [public roadmap](ROADMAP.md) for the v0.1 delivery sequence and issue map.
 
 ## Development
 
