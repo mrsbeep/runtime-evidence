@@ -11,6 +11,7 @@ const requiredPaths = [
   'GOVERNANCE.md',
   'LICENSE',
   'README.md',
+  'ROADMAP.md',
   'SECURITY.md',
   'SUPPORT.md',
   'docs/concepts/README.md',
