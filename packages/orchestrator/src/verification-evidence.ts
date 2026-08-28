@@ -114,7 +114,9 @@ function compareResult(
     : undefined;
 }
 
-function aggregatePolicy(results: readonly VerificationResult[]): EffectiveReplayPolicy {
+function aggregatePolicy(
+  results: readonly VerificationResult[],
+): NonNullable<EvidenceV1['policy']> {
   const first = results[0];
   if (first === undefined) {
     throw new TypeError('At least one verification result is required.');
@@ -141,8 +143,16 @@ function aggregatePolicy(results: readonly VerificationResult[]): EffectiveRepla
     first.policy.network.hookProcesses,
   );
   return {
-    network: { ...first.policy.network, hookProcesses },
-    sideEffects: { ...first.policy.sideEffects },
+    network: {
+      ...first.policy.network,
+      allowHosts: [...first.policy.network.allowHosts],
+      allowDependencyHosts: [...first.policy.network.allowDependencyHosts],
+      hookProcesses,
+    },
+    sideEffects: {
+      ...first.policy.sideEffects,
+      isolatedTargets: [...first.policy.sideEffects.isolatedTargets],
+    },
   };
 }
 

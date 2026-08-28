@@ -59,7 +59,17 @@ export interface VerificationResult {
   readonly status: 'complete' | 'incomplete';
 }
 
-export type EffectiveReplayPolicy = NonNullable<EvidenceV1['policy']>;
+type EvidenceReplayPolicy = NonNullable<EvidenceV1['policy']>;
+
+export interface EffectiveReplayPolicy {
+  readonly network: Omit<EvidenceReplayPolicy['network'], 'allowDependencyHosts' | 'allowHosts'> & {
+    readonly allowDependencyHosts: readonly string[];
+    readonly allowHosts: readonly string[];
+  };
+  readonly sideEffects: Omit<EvidenceReplayPolicy['sideEffects'], 'isolatedTargets'> & {
+    readonly isolatedTargets: readonly ('baseline' | 'candidate')[];
+  };
+}
 
 export interface VerifyScenarioOptions {
   readonly config: Pick<EffectiveConfigV1, 'network' | 'sideEffects' | 'targets' | 'timeouts'>;

@@ -367,6 +367,8 @@ test('deny-by-default network policy prevents execution', async (context) => {
   assert.equal(result.policy.network.default, 'deny');
   assert.equal(result.policy.network.applicationRequests, 'enforced');
   assert.equal(result.policy.network.hookProcesses, 'not-used');
+  assert.equal(Object.isFrozen(result.policy.network.allowHosts), true);
+  assert.equal(Object.isFrozen(result.policy.network.allowDependencyHosts), true);
 });
 
 test('scenario hooks fail closed unless external process isolation is declared', async (context) => {
@@ -430,6 +432,7 @@ test('explicitly authorized state changes require and record isolated targets', 
   assert.equal(requestCount, 2);
   assert.equal(result.policy.sideEffects.allowStateChanging, true);
   assert.deepEqual(result.policy.sideEffects.isolatedTargets, ['baseline', 'candidate']);
+  assert.equal(Object.isFrozen(result.policy.sideEffects.isolatedTargets), true);
   assert.ok(
     result.limitations.some((limitation) => limitation.includes('not independently verified')),
   );

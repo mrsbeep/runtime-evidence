@@ -70,15 +70,15 @@ function effectivePolicy(
   return Object.freeze({
     network: Object.freeze({
       default: 'deny',
-      allowHosts: [...allowHosts],
-      allowDependencyHosts: [...allowDependencyHosts],
+      allowHosts: Object.freeze([...allowHosts]),
+      allowDependencyHosts: Object.freeze([...allowDependencyHosts]),
       applicationRequests: 'enforced',
       hookProcesses,
       platform: platform(),
     }),
     sideEffects: Object.freeze({
       allowStateChanging: options.config.sideEffects?.allowStateChanging ?? false,
-      isolatedTargets: [...isolatedTargets],
+      isolatedTargets: Object.freeze([...isolatedTargets]),
     }),
   });
 }
