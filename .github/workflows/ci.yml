@@ -35,6 +35,21 @@ jobs:
       - name: Validate structure and metadata
         run: npm run check
 
+      - name: Confirm acceptance diagnostics are safe to upload
+        id: acceptance_diagnostics
+        if: always()
+        run: npm run verify:acceptance-diagnostics
+
+      - name: Upload acceptance diagnostics
+        if: always() && steps.acceptance_diagnostics.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-diagnostics-node-22
+          path: .runtime-evidence/acceptance/diagnostics.json
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
+
   current-node:
     name: Validate current Node.js
     runs-on: ubuntu-latest
@@ -54,3 +69,18 @@ jobs:
 
       - name: Validate structure and metadata
         run: npm run check
+
+      - name: Confirm acceptance diagnostics are safe to upload
+        id: acceptance_diagnostics
+        if: always()
+        run: npm run verify:acceptance-diagnostics
+
+      - name: Upload acceptance diagnostics
+        if: always() && steps.acceptance_diagnostics.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-diagnostics-node-current
+          path: .runtime-evidence/acceptance/diagnostics.json
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
