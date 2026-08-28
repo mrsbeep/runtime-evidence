@@ -7,7 +7,7 @@ import {
   ScenarioLifecycleError,
   runScenarioLifecycle,
 } from './hooks.ts';
-import { configuredTargets, sideEffectDenied } from './verification-policy.ts';
+import { configuredTargets, evaluateReplayPolicy } from './verification-policy.ts';
 import { finalizeResult, interruptedFailure, lifecycleFailures } from './verification-result.ts';
 import { executeVerificationTarget } from './verification-target.ts';
 import type {
@@ -27,9 +27,17 @@ function validateTimeout(timeoutMs: number): void {
 export async function verifyScenario(options: VerifyScenarioOptions): Promise<VerificationResult> {
   validateTimeout(options.totalTimeoutMs);
   const startedAt = performance.now();
-
-  if (options.scenario.safety.classification === 'state-changing') {
-    return finalizeResult(options.scenario.id, startedAt, undefined, [sideEffectDenied()]);
+  const targets = configuredTargets(options);
+  const policy = evaluateReplayPolicy(options, targets);
+  if (policy.failures.length > 0) {
+    return finalizeResult(
+      options.scenario.id,
+      startedAt,
+      undefined,
+      policy.failures,
+      policy.policy,
+      policy.limitations,
+    );
   }
 
   let totalTimedOut = false;
@@ -49,7 +57,6 @@ export async function verifyScenario(options: VerifyScenarioOptions): Promise<Ve
   }, options.totalTimeoutMs);
   totalTimer.unref();
 
-  const targets = configuredTargets(options);
   let execution: PairedExecution | undefined;
   let failures: readonly VerificationFailure[] = [];
 
@@ -116,5 +123,12 @@ export async function verifyScenario(options: VerifyScenarioOptions): Promise<Ve
     options.signal?.removeEventListener('abort', onInterrupt);
   }
 
-  return finalizeResult(options.scenario.id, startedAt, execution, failures);
+  return finalizeResult(
+    options.scenario.id,
+    startedAt,
+    execution,
+    failures,
+    policy.policy,
+    policy.limitations,
+  );
 }

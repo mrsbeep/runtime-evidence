@@ -5,7 +5,11 @@
   },
   "targets": {
     "baseline": {
-      "url": "http://127.0.0.1:4100"
+      "url": "http://127.0.0.1:4100",
+      "isolation": {
+        "kind": "container",
+        "reference": "baseline-local-container"
+      }
     },
     "candidate": {
       "url": {
@@ -23,7 +27,11 @@
   },
   "network": {
     "default": "deny",
-    "allowHosts": ["127.0.0.1"]
+    "allowHosts": ["127.0.0.1"],
+    "allowDependencyHosts": []
+  },
+  "sideEffects": {
+    "allowStateChanging": false
   },
   "redaction": {
     "headers": ["authorization", "cookie", "set-cookie"],

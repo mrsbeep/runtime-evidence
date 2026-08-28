@@ -74,6 +74,17 @@ export function mixedEvidencePayload(): EvidencePayloadV1 {
       scenariosCompleted: 3,
       assertionsEvaluated: 3,
     },
+    policy: {
+      network: {
+        default: 'deny',
+        allowHosts: ['127.0.0.1'],
+        allowDependencyHosts: [],
+        applicationRequests: 'enforced',
+        hookProcesses: 'not-used',
+        platform: 'linux',
+      },
+      sideEffects: { allowStateChanging: false, isolatedTargets: [] },
+    },
     limitations: ['Database side effects were not evaluated.'],
     skippedChecks: [{ check: 'response-body', reason: 'No candidate response was available.' }],
     infrastructureErrors: ['Candidate connection was refused.'],

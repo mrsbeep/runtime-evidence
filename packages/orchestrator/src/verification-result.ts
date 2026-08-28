@@ -8,6 +8,7 @@ import {
 
 import type { ScenarioLifecycleError } from './hooks.ts';
 import type {
+  EffectiveReplayPolicy,
   PairedExecution,
   VerificationFailure,
   VerificationResult,
@@ -86,6 +87,8 @@ export function finalizeResult(
   startedAt: number,
   execution: PairedExecution | undefined,
   failures: readonly VerificationFailure[],
+  policy: EffectiveReplayPolicy,
+  limitations: readonly string[],
 ): VerificationResult {
   const targetFailures =
     execution === undefined
@@ -97,11 +100,13 @@ export function finalizeResult(
   return Object.freeze({
     durationMs: Math.max(0, performance.now() - startedAt),
     failures: allFailures,
+    limitations: Object.freeze([...limitations]),
     observations: Object.freeze({
       baseline: execution?.baseline.observation ?? null,
       candidate: execution?.candidate.observation ?? null,
     }),
     scenarioId,
+    policy,
     status: allFailures.length === 0 ? 'complete' : 'incomplete',
   });
 }

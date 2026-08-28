@@ -10,13 +10,14 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/orchestrator.test.ts test/verification.test.ts",
+    "test": "tsc -p tsconfig.test.json --noEmit && node --test test/orchestrator.test.ts test/verification.test.ts test/verification-evidence.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
     "node": ">=22.18.0"
   },
   "dependencies": {
+    "@runtime-evidence/comparators": "0.0.0",
     "@runtime-evidence/config": "0.0.0",
     "@runtime-evidence/evidence-schema": "0.0.0",
     "@runtime-evidence/replay-http": "0.0.0",

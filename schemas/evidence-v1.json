@@ -160,6 +160,75 @@
       },
       "additionalProperties": false
     },
+    "policy": {
+      "type": "object",
+      "required": ["network", "sideEffects"],
+      "properties": {
+        "network": {
+          "type": "object",
+          "required": [
+            "default",
+            "allowHosts",
+            "allowDependencyHosts",
+            "applicationRequests",
+            "hookProcesses",
+            "platform"
+          ],
+          "properties": {
+            "default": {
+              "type": "string",
+              "const": "deny"
+            },
+            "allowHosts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "allowDependencyHosts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "applicationRequests": {
+              "type": "string",
+              "const": "enforced"
+            },
+            "hookProcesses": {
+              "enum": ["not-used", "externally-isolated", "unsupported"]
+            },
+            "platform": {
+              "enum": ["darwin", "linux", "win32", "other"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "sideEffects": {
+          "type": "object",
+          "required": ["allowStateChanging", "isolatedTargets"],
+          "properties": {
+            "allowStateChanging": {
+              "type": "boolean"
+            },
+            "isolatedTargets": {
+              "type": "array",
+              "items": {
+                "enum": ["baseline", "candidate"]
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "Effective deny-by-default replay policy and enforcement capability."
+    },
     "limitations": {
       "type": "array",
       "items": {

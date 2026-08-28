@@ -4,8 +4,7 @@ import { commandHelp, rootHelp } from './help.ts';
 import { parseCommandOptions } from './options.ts';
 import { commandDefinition } from './registry.ts';
 import type { CliCommandName, CliCommandResult, CliOptions } from './types.ts';
-
-export const CLI_VERSION = '0.0.0';
+import { CLI_VERSION } from './version.ts';
 
 export type CliInvocation =
   | {

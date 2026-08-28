@@ -54,6 +54,7 @@ const Hook = Type.Object(
     command: NonEmptyString,
     args: Type.Array(Type.String()),
     env: Type.Optional(SensitiveStringMap),
+    idempotent: Type.Optional(Type.Literal(true)),
     timeoutMs: Type.Integer({ minimum: 1 }),
   },
   { additionalProperties: false },

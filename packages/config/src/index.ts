@@ -15,4 +15,5 @@ export {
   type LoadConfigOptions,
   loadConfig,
 } from './load.ts';
+export { normalizeNetworkHost } from './network.ts';
 export { ConfigSchemaV1, type ConfigV1 } from '@runtime-evidence/evidence-schema';

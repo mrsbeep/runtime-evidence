@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { createServer, type RequestListener } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test, { type TestContext } from 'node:test';
@@ -7,6 +9,7 @@ import test, { type TestContext } from 'node:test';
 import { loadConfig } from '@runtime-evidence/config';
 import {
   createEvidenceArtifact,
+  readEvidenceArtifact,
   serializeEvidenceArtifact,
 } from '@runtime-evidence/evidence-schema';
 
@@ -43,6 +46,23 @@ async function temporaryDirectory(context: TestContext): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'runtime-evidence-cli-'));
   context.after(async () => rm(directory, { force: true, recursive: true }));
   return directory;
+}
+
+async function startServer(context: TestContext, listener: RequestListener): Promise<string> {
+  const server = createServer(listener);
+  await new Promise<void>((resolvePromise, rejectPromise) => {
+    server.once('error', rejectPromise);
+    server.listen(0, '127.0.0.1', resolvePromise);
+  });
+  context.after(
+    () =>
+      new Promise<void>((resolvePromise) => {
+        server.closeAllConnections();
+        server.close(() => resolvePromise());
+      }),
+  );
+  const address = server.address() as AddressInfo;
+  return `http://127.0.0.1:${address.port}`;
 }
 
 function parseOnlyEnvelope(harness: Harness): CliOutputEnvelope {
@@ -184,14 +204,6 @@ test('an invalid runtime handler override fails closed', async () => {
   assert.equal(parseOnlyEnvelope(harness).code, 'CLI_HANDLER_UNAVAILABLE');
 });
 
-test('verify fails closed until its enforcement dependencies land', async () => {
-  const harness = createHarness();
-  const result = await runCli(['verify', '--json'], { io: harness.io });
-  const envelope = parseOnlyEnvelope(harness);
-  assert.equal(result.exitCode, 3);
-  assert.equal(envelope.status, 'incomplete');
-});
-
 test('init creates a valid fail-closed config and refuses accidental replacement', async (context) => {
   const directory = await temporaryDirectory(context);
   const harness = createHarness();
@@ -203,7 +215,12 @@ test('init creates a valid fail-closed config and refuses accidental replacement
   assert.equal(initialized.exitCode, 0);
   const loaded = await loadConfig({ startDirectory: directory });
   assert.equal(loaded.config.project.name, 'checkout-api');
-  assert.deepEqual(loaded.config.network, { default: 'deny', allowHosts: ['127.0.0.1'] });
+  assert.deepEqual(loaded.config.network, {
+    default: 'deny',
+    allowHosts: ['127.0.0.1'],
+    allowDependencyHosts: [],
+  });
+  assert.deepEqual(loaded.config.sideEffects, { allowStateChanging: false });
   assert.ok(loaded.config.redaction.headers.includes('authorization'));
 
   const secondHarness = createHarness();
@@ -224,6 +241,137 @@ test('init creates a valid fail-closed config and refuses accidental replacement
     (await loadConfig({ startDirectory: directory })).config.project.name,
     'replacement',
   );
+});
+
+test('verify writes sanitized policy evidence and maps a regression to exit code one', async (context) => {
+  const directory = await temporaryDirectory(context);
+  const scenarioDirectory = join(directory, 'scenarios');
+  const outputDirectory = join(directory, 'evidence-output');
+  const responseSecret = 'not-a-real-verify-response-secret';
+  const baselineUrl = await startServer(context, (_request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({ token: responseSecret, version: 'baseline' }));
+  });
+  const candidateUrl = await startServer(context, (_request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({ token: responseSecret, version: 'candidate' }));
+  });
+  await mkdir(scenarioDirectory, { recursive: true });
+  await writeFile(
+    join(directory, 'runtime-evidence.yaml'),
+    `schemaVersion: 1
+project:
+  name: "verify-cli-test"
+targets:
+  baseline:
+    url: "${baselineUrl}"
+  candidate:
+    url: "${candidateUrl}"
+scenarios:
+  include: ["scenarios/*.yaml"]
+network:
+  default: "deny"
+  allowHosts: ["127.0.0.1"]
+  allowDependencyHosts: []
+sideEffects:
+  allowStateChanging: false
+redaction:
+  headers: ["authorization"]
+  jsonPaths: []
+timeouts:
+  connectMs: 500
+  requestMs: 1000
+comparison:
+  ignoredJsonPaths: []
+  normalizedJsonPaths: []
+  maxLatencyRegressionPercent: 1000
+`,
+    'utf8',
+  );
+  await writeFile(
+    join(scenarioDirectory, 'version.yaml'),
+    JSON.stringify({
+      schemaVersion: 1,
+      id: 'version-regression',
+      name: 'Version regression',
+      provenance: { source: 'hand-authored' },
+      safety: { classification: 'read-only', rationale: 'Disposable local targets.' },
+      request: { method: 'GET', path: '/version' },
+    }),
+    'utf8',
+  );
+
+  const harness = createHarness();
+  const result = await runCli(['verify', '--output', outputDirectory, '--json'], {
+    cwd: directory,
+    io: harness.io,
+  });
+  const envelope = parseOnlyEnvelope(harness);
+  const evidence = await readEvidenceArtifact(join(outputDirectory, 'evidence.json'));
+
+  assert.equal(result.exitCode, 1);
+  assert.equal(envelope.code, 'CLI_VERIFY_FAILED');
+  assert.equal(evidence.state, 'fail');
+  assert.equal(evidence.policy?.network.default, 'deny');
+  assert.equal(evidence.policy?.network.applicationRequests, 'enforced');
+  assert.equal(evidence.results[0]?.differences[0]?.path, '/response/body/version');
+  assert.doesNotMatch(JSON.stringify(evidence), new RegExp(responseSecret));
+  assert.ok(evidence.redaction.rules.includes('evidence:runtime-values'));
+});
+
+test('verify denies an unapproved state-changing scenario before either target is contacted', async (context) => {
+  const directory = await temporaryDirectory(context);
+  const scenarioDirectory = join(directory, 'scenarios');
+  const outputDirectory = join(directory, 'evidence-output');
+  let requestCount = 0;
+  const targetUrl = await startServer(context, (_request, response) => {
+    requestCount += 1;
+    response.end('unexpected');
+  });
+  await mkdir(scenarioDirectory, { recursive: true });
+  await writeFile(
+    join(directory, 'runtime-evidence.yaml'),
+    `schemaVersion: 1
+project:
+  name: "state-change-policy-test"
+targets:
+  baseline:
+    url: "${targetUrl}"
+  candidate:
+    url: "${targetUrl}"
+scenarios:
+  include: ["scenarios/*.yaml"]
+network:
+  default: "deny"
+  allowHosts: ["127.0.0.1"]
+`,
+    'utf8',
+  );
+  await writeFile(
+    join(scenarioDirectory, 'mutation.yaml'),
+    JSON.stringify({
+      schemaVersion: 1,
+      id: 'mutation',
+      name: 'Mutation',
+      provenance: { source: 'hand-authored' },
+      safety: { classification: 'state-changing', rationale: 'Mutates server state.' },
+      request: { method: 'POST', path: '/mutation' },
+    }),
+    'utf8',
+  );
+
+  const harness = createHarness();
+  const result = await runCli(['verify', '--output', outputDirectory, '--json'], {
+    cwd: directory,
+    io: harness.io,
+  });
+  const evidence = await readEvidenceArtifact(join(outputDirectory, 'evidence.json'));
+
+  assert.equal(result.exitCode, 3);
+  assert.equal(parseOnlyEnvelope(harness).code, 'CLI_VERIFY_INCOMPLETE');
+  assert.equal(requestCount, 0);
+  assert.equal(evidence.state, 'incomplete');
+  assert.match(evidence.infrastructureErrors.join('\n'), /VERIFY_SIDE_EFFECT_DENIED/);
 });
 
 test('doctor returns safe config metadata without resolved target values', async (context) => {

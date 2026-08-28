@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "legacy-v1-project"
+  },
+  "targets": {
+    "baseline": {
+      "url": "http://127.0.0.1:4100"
+    },
+    "candidate": {
+      "url": "http://127.0.0.1:4200"
+    }
+  },
+  "scenarios": {
+    "include": ["scenarios/*.yaml"]
+  },
+  "network": {
+    "default": "deny",
+    "allowHosts": ["127.0.0.1"]
+  },
+  "redaction": {
+    "headers": ["authorization"],
+    "jsonPaths": []
+  },
+  "timeouts": {
+    "connectMs": 1000,
+    "requestMs": 5000
+  },
+  "comparison": {
+    "ignoredJsonPaths": [],
+    "maxLatencyRegressionPercent": 20
+  }
+}

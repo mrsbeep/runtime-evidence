@@ -52,6 +52,17 @@ observation. Target availability, setup, timeout, interruption, cleanup, and tra
 distinguishable. Any failure makes the result `incomplete`; execution only reports `complete` and
 never reports `pass`. Pass/fail is reserved for the deterministic comparison stage.
 
-Target hosts must appear in `network.allowHosts`, and state-changing scenarios fail closed until a
-later policy layer can grant them explicitly. Response bodies are runtime-only unsanitized data and
-must pass through redaction before any persistence or logging.
+Target hosts must appear in `network.allowHosts`; auxiliary destinations use the separate
+`network.allowDependencyHosts` list. Both lists accept hostname-only entries and are normalized
+before policy evaluation. Scenario hooks fail closed before setup unless an external container or
+virtual-machine network boundary is declared.
+
+State-changing scenarios require `sideEffects.allowStateChanging: true` and isolation metadata on
+both targets. Any cleanup hooks for those scenarios must declare `idempotent: true`. External
+isolation is an operator assertion rather than an independently verified guarantee, and that
+limitation is carried into the verification result.
+
+`createVerificationEvidencePayload` converts typed results into canonical evidence input. Runtime
+body, JSON, and selected-header difference values are replaced by explicit redaction markers;
+secret-shaped structural paths and invalid target URLs are also prevented from reaching the
+artifact. Effective policy and enforcement limitations are included in every assembled run.
