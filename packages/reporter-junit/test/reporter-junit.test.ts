@@ -32,6 +32,8 @@ test('maps behavioral failure and incomplete evidence to non-passing JUnit cases
   assert.match(first, /Status &lt; changed &amp; requires review/);
   assert.match(first, /Candidate connection was refused/);
   assert.match(first, /Redaction: applied; 2 values removed/);
+  assert.match(first, /name="networkDefault" value="deny"/);
+  assert.match(first, /hookProcesses=not-used/);
 });
 
 test('adds a failing run-policy case when no scenario can represent incomplete evidence', () => {

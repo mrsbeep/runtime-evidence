@@ -4,7 +4,7 @@ import { doctorCommand } from './commands/doctor.ts';
 import { initCommand } from './commands/init.ts';
 import { reportCommand } from './commands/report.ts';
 import { schemaCommand } from './commands/schema.ts';
-import { verifyCommand } from './commands/unavailable.ts';
+import { verifyCommand } from './commands/verify.ts';
 import type { CliCommandHandler, CliCommandName } from './types.ts';
 
 const definitions: readonly CliCommandDefinition[] = [

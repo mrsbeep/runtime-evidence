@@ -1,5 +1,5 @@
 import type { EffectiveConfigV1 } from '@runtime-evidence/config';
-import type { ScenarioV1 } from '@runtime-evidence/evidence-schema';
+import type { EvidenceV1, ScenarioV1 } from '@runtime-evidence/evidence-schema';
 import type {
   HttpExecutionFailureCode,
   HttpObservation,
@@ -11,7 +11,11 @@ import type { ScenarioDiagnosticCode } from './diagnostics.ts';
 
 export const VerificationFailureCodes = [
   'VERIFY_NETWORK_DENIED',
+  'VERIFY_NETWORK_ENFORCEMENT_UNSUPPORTED',
+  'VERIFY_POLICY_INVALID',
   'VERIFY_SIDE_EFFECT_DENIED',
+  'VERIFY_TARGET_NOT_ISOLATED',
+  'VERIFY_CLEANUP_NOT_IDEMPOTENT',
   'VERIFY_TOTAL_TIMEOUT',
   'VERIFY_INTERRUPTED',
   'VERIFY_INTERNAL_ERROR',
@@ -26,6 +30,7 @@ export type VerificationFailureCode =
 export type VerificationFailureKind =
   | 'cleanup'
   | 'interrupted'
+  | 'policy'
   | 'setup'
   | 'target'
   | 'timeout'
@@ -43,17 +48,21 @@ export interface VerificationFailure {
 export interface VerificationResult {
   readonly durationMs: number;
   readonly failures: readonly VerificationFailure[];
+  readonly limitations: readonly string[];
   readonly observations: {
     readonly baseline: HttpObservation | null;
     readonly candidate: HttpObservation | null;
   };
   readonly scenarioId: string;
+  readonly policy: EffectiveReplayPolicy;
   /** Execution completeness only. Pass/fail belongs to deterministic comparison. */
   readonly status: 'complete' | 'incomplete';
 }
 
+export type EffectiveReplayPolicy = NonNullable<EvidenceV1['policy']>;
+
 export interface VerifyScenarioOptions {
-  readonly config: Pick<EffectiveConfigV1, 'network' | 'targets' | 'timeouts'>;
+  readonly config: Pick<EffectiveConfigV1, 'network' | 'sideEffects' | 'targets' | 'timeouts'>;
   readonly cwd: string;
   readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly maxResponseBodyBytes?: number;

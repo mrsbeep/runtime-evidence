@@ -4,7 +4,7 @@ This directory contains the language-neutral contracts for Runtime Evidence:
 
 - `config-v1.json` configures targets, scenario selection, and safety policies.
 - `scenario-v1.json` describes a replayable request and its provenance, including optional capture-redaction metadata applied before persistence.
-- `evidence-v1.json` records the outcome and integrity metadata of a run.
+- `evidence-v1.json` records the outcome, effective replay policy, enforcement limitations, and integrity metadata of a run.
 
 TypeBox definitions in `packages/evidence-schema/src/` are the source of truth. Run
 `npm run generate:schemas` after changing them; do not edit generated JSON by hand. Tests compare

@@ -169,6 +169,10 @@
               }
             }
           },
+          "idempotent": {
+            "type": "boolean",
+            "const": true
+          },
           "timeoutMs": {
             "type": "integer",
             "minimum": 1
@@ -216,6 +220,10 @@
                 ]
               }
             }
+          },
+          "idempotent": {
+            "type": "boolean",
+            "const": true
           },
           "timeoutMs": {
             "type": "integer",

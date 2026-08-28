@@ -60,6 +60,35 @@ const Coverage = Type.Object(
   { additionalProperties: false },
 );
 
+const ReplayPolicy = Type.Object(
+  {
+    network: Type.Object(
+      {
+        default: Type.Literal('deny'),
+        allowHosts: Type.Array(NonEmptyString, { uniqueItems: true }),
+        allowDependencyHosts: Type.Array(NonEmptyString, { uniqueItems: true }),
+        applicationRequests: Type.Literal('enforced'),
+        hookProcesses: Type.Enum(['not-used', 'externally-isolated', 'unsupported']),
+        platform: Type.Enum(['darwin', 'linux', 'win32', 'other']),
+      },
+      { additionalProperties: false },
+    ),
+    sideEffects: Type.Object(
+      {
+        allowStateChanging: Type.Boolean(),
+        isolatedTargets: Type.Array(Type.Enum(['baseline', 'candidate']), {
+          uniqueItems: true,
+        }),
+      },
+      { additionalProperties: false },
+    ),
+  },
+  {
+    additionalProperties: false,
+    description: 'Effective deny-by-default replay policy and enforcement capability.',
+  },
+);
+
 const Integrity = Type.Object(
   {
     algorithm: Type.Literal('sha256'),
@@ -97,6 +126,7 @@ export const EvidenceSchemaV1 = Type.Object(
     ),
     results: Type.Array(ScenarioResult),
     coverage: Coverage,
+    policy: Type.Optional(ReplayPolicy),
     limitations: Type.Array(NonEmptyString),
     skippedChecks: Type.Array(SkippedCheck),
     infrastructureErrors: Type.Array(NonEmptyString),

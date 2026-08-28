@@ -23,6 +23,9 @@ network:
   default: "deny"
   allowHosts:
     - "127.0.0.1"
+  allowDependencyHosts: []
+sideEffects:
+  allowStateChanging: false
 redaction:
   headers:
     - "authorization"

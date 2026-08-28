@@ -16,3 +16,8 @@ Response bodies default to a 1 MiB limit. Sensitive response headers are never c
 selected. Content type is always captured so downstream body comparison has an explicit media-type
 contract. Target URLs must be HTTP or HTTPS origins and cannot contain credentials, paths, query
 parameters, or fragments.
+
+The orchestrator performs application-layer hostname policy checks before this package is called.
+Node.js does not provide portable child-process or operating-system egress virtualization, so
+scenario hooks require an externally declared isolation boundary rather than inheriting the HTTP
+client's application-only enforcement.

@@ -33,6 +33,14 @@ test('creates schema-valid evidence with reproducible integrity and serializatio
   assert.equal(Object.isFrozen(first), true);
 });
 
+test('policy metadata remains optional for existing version 1 evidence', () => {
+  const { policy: _policy, ...prePolicyPayload } = mixedEvidencePayload();
+  const evidence = createEvidenceArtifact(prePolicyPayload);
+
+  assert.equal(evidence.policy, undefined);
+  assert.equal(evidence.state, 'incomplete');
+});
+
 test('the committed passing fixture has valid canonical integrity', async () => {
   const fixture = await readEvidenceArtifact(
     resolve(import.meta.dirname, '../../../schemas/fixtures/evidence/valid/passing-run.json'),
@@ -41,7 +49,7 @@ test('the committed passing fixture has valid canonical integrity', async () => 
   assert.equal(fixture.state, 'pass');
   assert.equal(
     fixture.integrity.digest,
-    'b82b12fa04ab4bf3147803b423ba0f5489ef506c989059f1e39dd90bb66abd48',
+    '0342a9949a3d6abf21eeb4bd84a2369a592941651df5c3c9767f8963af42da74',
   );
 });
 

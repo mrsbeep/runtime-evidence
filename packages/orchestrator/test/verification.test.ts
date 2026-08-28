@@ -54,6 +54,37 @@ function config(
   };
 }
 
+function withHookIsolation(
+  configured: VerifyScenarioOptions['config'],
+): VerifyScenarioOptions['config'] {
+  return {
+    ...configured,
+    network: {
+      ...configured.network,
+      hookIsolation: { kind: 'container', reference: 'verification-test-sandbox' },
+    },
+  };
+}
+
+function withStateChangingIsolation(
+  configured: VerifyScenarioOptions['config'],
+): VerifyScenarioOptions['config'] {
+  return {
+    ...configured,
+    targets: {
+      baseline: {
+        ...configured.targets.baseline,
+        isolation: { kind: 'container', reference: 'baseline-test-container' },
+      },
+      candidate: {
+        ...configured.targets.candidate,
+        isolation: { kind: 'container', reference: 'candidate-test-container' },
+      },
+    },
+    sideEffects: { allowStateChanging: true },
+  };
+}
+
 async function requestBody(request: IncomingMessage): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of request) {
@@ -114,10 +145,11 @@ function receivedRequest(request: IncomingMessage, body: string): ReceivedReques
   };
 }
 
-function hook(logPath: string, value: string, exitCode: number): ScenarioHook {
+function hook(logPath: string, value: string, exitCode: number, idempotent = false): ScenarioHook {
   return {
     command: process.execPath,
     args: [hookHelperPath, 'append', logPath, value, '0', String(exitCode)],
+    ...(idempotent ? { idempotent: true as const } : {}),
     timeoutMs: 2_000,
   };
 }
@@ -239,9 +271,11 @@ test('setup failure is distinct and cleanup is still attempted', async (context)
     cleanup: [hook(logPath, 'cleanup', 0)],
   });
 
-  const result = await execute(config('http://127.0.0.1:1', 'http://127.0.0.1:1'), testScenario, {
-    totalTimeoutMs: 3_000,
-  });
+  const result = await execute(
+    withHookIsolation(config('http://127.0.0.1:1', 'http://127.0.0.1:1')),
+    testScenario,
+    { totalTimeoutMs: 3_000 },
+  );
 
   assert.equal(result.status, 'incomplete');
   assert.ok(
@@ -261,7 +295,7 @@ test('cleanup failure preserves observations but makes the result incomplete', a
   const candidateUrl = await startServer(context, (_request, response) => response.end('ready'));
   const testScenario = scenario({ cleanup: [hook(logPath, 'cleanup', 2)] });
 
-  const result = await execute(config(baselineUrl, candidateUrl), testScenario);
+  const result = await execute(withHookIsolation(config(baselineUrl, candidateUrl)), testScenario);
 
   assert.equal(result.status, 'incomplete');
   assert.ok(result.observations.baseline !== null);
@@ -330,6 +364,24 @@ test('deny-by-default network policy prevents execution', async (context) => {
   assert.equal(requestCount, 0);
   assert.equal(result.failures.length, 2);
   assert.ok(result.failures.every(({ code }) => code === 'VERIFY_NETWORK_DENIED'));
+  assert.equal(result.policy.network.default, 'deny');
+  assert.equal(result.policy.network.applicationRequests, 'enforced');
+  assert.equal(result.policy.network.hookProcesses, 'not-used');
+});
+
+test('scenario hooks fail closed unless external process isolation is declared', async (context) => {
+  const directory = await mkdtemp(join(tmpdir(), 'runtime-evidence-hook-policy-'));
+  context.after(async () => rm(directory, { force: true, recursive: true }));
+  const logPath = join(directory, 'hooks.log');
+  const result = await execute(
+    config('http://127.0.0.1:1', 'http://127.0.0.1:1'),
+    scenario({ setup: [hook(logPath, 'unsafe', 0)] }),
+  );
+
+  assert.equal(result.status, 'incomplete');
+  assert.equal(result.policy.network.hookProcesses, 'unsupported');
+  assert.ok(result.failures.some(({ code }) => code === 'VERIFY_NETWORK_ENFORCEMENT_UNSUPPORTED'));
+  await assert.rejects(readFile(logPath, 'utf8'));
 });
 
 test('state-changing scenarios fail closed before execution', async (context) => {
@@ -349,8 +401,85 @@ test('state-changing scenarios fail closed before execution', async (context) =>
 
   assert.equal(result.status, 'incomplete');
   assert.equal(requestCount, 0);
-  assert.deepEqual(
-    result.failures.map(({ code }) => code),
-    ['VERIFY_SIDE_EFFECT_DENIED'],
+  assert.ok(result.failures.some(({ code }) => code === 'VERIFY_SIDE_EFFECT_DENIED'));
+  assert.equal(
+    result.failures.filter(({ code }) => code === 'VERIFY_TARGET_NOT_ISOLATED').length,
+    2,
   );
+});
+
+test('explicitly authorized state changes require and record isolated targets', async (context) => {
+  let requestCount = 0;
+  const targetUrl = await startServer(context, (_request, response) => {
+    requestCount += 1;
+    response.end('changed');
+  });
+  const testScenario = scenario({
+    safety: {
+      classification: 'state-changing',
+      rationale: 'Mutates disposable isolated test containers.',
+    },
+  });
+
+  const result = await execute(
+    withStateChangingIsolation(config(targetUrl, targetUrl)),
+    testScenario,
+  );
+
+  assert.equal(result.status, 'complete');
+  assert.equal(requestCount, 2);
+  assert.equal(result.policy.sideEffects.allowStateChanging, true);
+  assert.deepEqual(result.policy.sideEffects.isolatedTargets, ['baseline', 'candidate']);
+  assert.ok(
+    result.limitations.some((limitation) => limitation.includes('not independently verified')),
+  );
+});
+
+test('state-changing cleanup must explicitly declare idempotent behavior', async (context) => {
+  const directory = await mkdtemp(join(tmpdir(), 'runtime-evidence-idempotent-policy-'));
+  context.after(async () => rm(directory, { force: true, recursive: true }));
+  const logPath = join(directory, 'cleanup.log');
+  const configured = withHookIsolation(
+    withStateChangingIsolation(config('http://127.0.0.1:1', 'http://127.0.0.1:1')),
+  );
+  const result = await execute(
+    configured,
+    scenario({
+      safety: {
+        classification: 'state-changing',
+        rationale: 'Mutates disposable isolated test containers.',
+      },
+      cleanup: [hook(logPath, 'cleanup', 0)],
+    }),
+  );
+
+  assert.equal(result.status, 'incomplete');
+  assert.ok(result.failures.some(({ code }) => code === 'VERIFY_CLEANUP_NOT_IDEMPOTENT'));
+  await assert.rejects(readFile(logPath, 'utf8'));
+});
+
+test('authorized state-changing verification runs declared idempotent cleanup', async (context) => {
+  const directory = await mkdtemp(join(tmpdir(), 'runtime-evidence-idempotent-cleanup-'));
+  context.after(async () => rm(directory, { force: true, recursive: true }));
+  const logPath = join(directory, 'cleanup.log');
+  let requestCount = 0;
+  const targetUrl = await startServer(context, (_request, response) => {
+    requestCount += 1;
+    response.end('changed');
+  });
+  const configured = withHookIsolation(withStateChangingIsolation(config(targetUrl, targetUrl)));
+  const result = await execute(
+    configured,
+    scenario({
+      safety: {
+        classification: 'state-changing',
+        rationale: 'Mutates disposable isolated test containers.',
+      },
+      cleanup: [hook(logPath, 'cleanup', 0, true)],
+    }),
+  );
+
+  assert.equal(result.status, 'complete');
+  assert.equal(requestCount, 2);
+  assert.equal(await readFile(logPath, 'utf8'), 'cleanup\n');
 });

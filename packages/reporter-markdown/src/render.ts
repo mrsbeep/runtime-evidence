@@ -130,6 +130,29 @@ function renderMissingEvidence(evidence: EvidenceV1): readonly string[] {
   return [...lines, ''];
 }
 
+function renderReplayPolicy(evidence: EvidenceV1): readonly string[] {
+  const policy = evidence.policy;
+  if (policy === undefined) {
+    return [];
+  }
+  const targetHosts = policy.network.allowHosts.map(code).join(', ') || '_None._';
+  const dependencyHosts = policy.network.allowDependencyHosts.map(code).join(', ') || '_None._';
+  const isolatedTargets = policy.sideEffects.isolatedTargets.map(code).join(', ') || '_None._';
+  return [
+    '## Replay policy',
+    '',
+    `- Network default: ${code(policy.network.default)}`,
+    `- Allowed target hosts: ${targetHosts}`,
+    `- Allowed dependency hosts: ${dependencyHosts}`,
+    `- Application requests: ${code(policy.network.applicationRequests)}`,
+    `- Hook processes: ${code(policy.network.hookProcesses)}`,
+    `- Platform: ${code(policy.network.platform)}`,
+    `- State-changing scenarios allowed: ${policy.sideEffects.allowStateChanging ? 'yes' : 'no'}`,
+    `- Isolated targets: ${isolatedTargets}`,
+    '',
+  ];
+}
+
 /** Renders a deterministic review summary after validating schema and integrity. */
 export function renderMarkdownEvidence(value: unknown): string {
   const evidence = validateEvidenceArtifact(value);
@@ -169,6 +192,7 @@ export function renderMarkdownEvidence(value: unknown): string {
     ),
     ...renderDifferenceSection('Expected differences', expected, []),
     ...renderMissingEvidence(evidence),
+    ...renderReplayPolicy(evidence),
     '## Coverage and limitations',
     '',
     `- Scenarios selected: ${evidence.coverage.scenariosSelected}`,

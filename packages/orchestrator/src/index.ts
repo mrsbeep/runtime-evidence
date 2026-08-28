@@ -24,6 +24,7 @@ export {
   loadScenarios,
 } from './scenario-loader.ts';
 export {
+  type EffectiveReplayPolicy,
   type VerificationFailure,
   type VerificationFailureCode,
   type VerificationFailureKind,
@@ -34,4 +35,9 @@ export {
   type VerifyScenarioOptions,
 } from './verification-types.ts';
 export { verifyScenario } from './verification.ts';
+export {
+  type CreateVerificationEvidenceOptions,
+  createVerificationEvidencePayload,
+} from './verification-evidence.ts';
 export { ScenarioSchemaV1, type ScenarioV1 } from '@runtime-evidence/evidence-schema';
+export { ComparisonConfigurationError } from '@runtime-evidence/comparators';

@@ -143,6 +143,12 @@ function renderRunTestCase(evidence: EvidenceV1): RenderedTestCase | undefined {
 function suiteOutput(evidence: EvidenceV1): string {
   return [
     `Policy decision: ${evidence.state}`,
+    ...(evidence.policy === undefined
+      ? []
+      : [
+          `Network policy: default=${evidence.policy.network.default}; applicationRequests=${evidence.policy.network.applicationRequests}; hookProcesses=${evidence.policy.network.hookProcesses}; platform=${evidence.policy.network.platform}.`,
+          `State-changing scenarios allowed: ${evidence.policy.sideEffects.allowStateChanging ? 'yes' : 'no'}.`,
+        ]),
     `Coverage: ${evidence.coverage.scenariosCompleted}/${evidence.coverage.scenariosSelected} scenarios completed; ${evidence.coverage.assertionsEvaluated} assertions evaluated.`,
     ...evidence.limitations.map((limitation) => `Limitation: ${limitation}`),
     ...evidence.skippedChecks.map((skipped) => `Skipped ${skipped.check}: ${skipped.reason}`),
@@ -175,6 +181,13 @@ export function renderJUnitEvidence(value: unknown): string {
     `      <property name="evidenceSha256" value="${evidence.integrity.digest}"/>`,
     `      <property name="baseline" value="${escapeXml(evidence.targets.baseline.url)}"/>`,
     `      <property name="candidate" value="${escapeXml(evidence.targets.candidate.url)}"/>`,
+    ...(evidence.policy === undefined
+      ? []
+      : [
+          `      <property name="networkDefault" value="${evidence.policy.network.default}"/>`,
+          `      <property name="applicationRequestEnforcement" value="${evidence.policy.network.applicationRequests}"/>`,
+          `      <property name="hookProcessEnforcement" value="${evidence.policy.network.hookProcesses}"/>`,
+        ]),
     '    </properties>',
     ...cases.flatMap((testCase) => testCase.lines),
     `    <system-out>${escapeXml(suiteOutput(evidence))}</system-out>`,

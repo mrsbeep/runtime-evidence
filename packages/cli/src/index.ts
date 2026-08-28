@@ -1,5 +1,5 @@
 export { CliExitCodes, exitCodeForStatus } from './exit-codes.ts';
-export { CLI_VERSION } from './invocation.ts';
+export { CLI_VERSION } from './version.ts';
 export { runCli } from './run.ts';
 export {
   type CliCommandContext,

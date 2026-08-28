@@ -76,6 +76,21 @@
                   ]
                 }
               }
+            },
+            "isolation": {
+              "type": "object",
+              "required": ["kind", "reference"],
+              "properties": {
+                "kind": {
+                  "enum": ["container", "virtual-machine"]
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "description": "Externally managed isolation asserted by the local operator."
             }
           },
           "additionalProperties": false
@@ -126,6 +141,21 @@
                   ]
                 }
               }
+            },
+            "isolation": {
+              "type": "object",
+              "required": ["kind", "reference"],
+              "properties": {
+                "kind": {
+                  "enum": ["container", "virtual-machine"]
+                },
+                "reference": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "description": "Externally managed isolation asserted by the local operator."
             }
           },
           "additionalProperties": false
@@ -172,10 +202,44 @@
             "minLength": 1
           },
           "uniqueItems": true
+        },
+        "allowDependencyHosts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "hookIsolation": {
+          "type": "object",
+          "required": ["kind", "reference"],
+          "properties": {
+            "kind": {
+              "enum": ["container", "virtual-machine"]
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "description": "Externally managed isolation asserted by the local operator."
         }
       },
       "additionalProperties": false,
       "description": "Outbound network policy. Version 1 always fails closed by default."
+    },
+    "sideEffects": {
+      "type": "object",
+      "required": ["allowStateChanging"],
+      "properties": {
+        "allowStateChanging": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Explicit authorization for scenarios classified as state-changing."
     },
     "redaction": {
       "type": "object",

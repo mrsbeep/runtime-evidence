@@ -32,6 +32,20 @@
     "scenariosCompleted": 1,
     "assertionsEvaluated": 3
   },
+  "policy": {
+    "network": {
+      "default": "deny",
+      "allowHosts": ["127.0.0.1"],
+      "allowDependencyHosts": [],
+      "applicationRequests": "enforced",
+      "hookProcesses": "not-used",
+      "platform": "linux"
+    },
+    "sideEffects": {
+      "allowStateChanging": false,
+      "isolatedTargets": []
+    }
+  },
   "limitations": [],
   "skippedChecks": [],
   "infrastructureErrors": [],
@@ -42,6 +56,6 @@
   },
   "integrity": {
     "algorithm": "sha256",
-    "digest": "b82b12fa04ab4bf3147803b423ba0f5489ef506c989059f1e39dd90bb66abd48"
+    "digest": "0342a9949a3d6abf21eeb4bd84a2369a592941651df5c3c9767f8963af42da74"
   }
 }

@@ -7,10 +7,22 @@ import {
   StringOrSecretReference,
 } from './common.ts';
 
+const IsolationDeclaration = Type.Object(
+  {
+    kind: Type.Enum(['container', 'virtual-machine']),
+    reference: NonEmptyString,
+  },
+  {
+    additionalProperties: false,
+    description: 'Externally managed isolation asserted by the local operator.',
+  },
+);
+
 const Target = Type.Object(
   {
     url: StringOrSecretReference,
     headers: Type.Optional(SensitiveStringMap),
+    isolation: Type.Optional(IsolationDeclaration),
   },
   { additionalProperties: false },
 );
@@ -27,10 +39,22 @@ const NetworkPolicy = Type.Object(
   {
     default: Type.Literal('deny'),
     allowHosts: Type.Array(NonEmptyString, { uniqueItems: true }),
+    allowDependencyHosts: Type.Optional(Type.Array(NonEmptyString, { uniqueItems: true })),
+    hookIsolation: Type.Optional(IsolationDeclaration),
   },
   {
     additionalProperties: false,
     description: 'Outbound network policy. Version 1 always fails closed by default.',
+  },
+);
+
+const SideEffectPolicy = Type.Object(
+  {
+    allowStateChanging: Type.Boolean(),
+  },
+  {
+    additionalProperties: false,
+    description: 'Explicit authorization for scenarios classified as state-changing.',
   },
 );
 
@@ -78,6 +102,7 @@ export const ConfigSchemaV1 = Type.Object(
     ),
     scenarios: ScenarioSelection,
     network: NetworkPolicy,
+    sideEffects: Type.Optional(SideEffectPolicy),
     redaction: RedactionPolicy,
     timeouts: Timeouts,
     comparison: ComparisonPolicy,

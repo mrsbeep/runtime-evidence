@@ -22,6 +22,7 @@ runtime-evidence init --yes --project checkout-api
 runtime-evidence doctor --json
 runtime-evidence capture --input capture.json
 runtime-evidence capture --input capture.json --output scenarios --yes
+runtime-evidence verify --output .runtime-evidence
 runtime-evidence report --input evidence.json --format junit --output evidence.junit.xml
 runtime-evidence schema --kind evidence
 ```
@@ -40,6 +41,11 @@ Interrupted and incomplete execution can never produce exit code `0`. Error mess
 
 ## v0.1 safety boundary
 
-`init`, `doctor`, `capture`, `report`, and `schema` are functional. Capture is preview-only unless `--yes` is supplied: raw input remains in memory, the sanitized preview is emitted before saving, and an existing scenario is never replaced. `verify` currently exits with code `3` until outbound-network enforcement is implemented. This fail-closed behavior prevents unfinished policy enforcement from claiming a pass.
+All v0.1 command surfaces are functional. Capture is preview-only unless `--yes` is supplied: raw
+input remains in memory, the sanitized preview is emitted before saving, and an existing scenario
+is never replaced. `verify` discovers validated scenarios, enforces replay policy before execution,
+compares complete observation pairs, and writes canonical `evidence.json` under
+`.runtime-evidence/` by default. Behavioral regressions return code `1`; policy, interruption, or
+collection gaps write incomplete evidence and return code `3`.
 
 The CLI performs no telemetry or network reporting. It does not persist resolved secret values, and `doctor` reports only safe configuration metadata.

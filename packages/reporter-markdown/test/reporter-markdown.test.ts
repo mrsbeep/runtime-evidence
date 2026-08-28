@@ -31,6 +31,8 @@ test('separates outcomes and renders every evidence category deterministically',
   assert.match(first, /candidate-unavailable/);
   assert.match(first, /Candidate connection was refused/);
   assert.match(first, /Database side effects were not evaluated/);
+  assert.match(first, /## Replay policy/);
+  assert.match(first, /Allowed target hosts: <code>127\.0\.0\.1<\/code>/);
   assert.match(first, /Values removed: 2/);
   assert.match(first, /\[REDACTED\]/);
   assert.doesNotMatch(first, /"state":"redacted"/);

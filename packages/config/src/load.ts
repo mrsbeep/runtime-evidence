@@ -8,6 +8,7 @@ import { parseDocument } from 'yaml';
 
 import { hashConfig } from './canonical.ts';
 import { type ConfigDiagnostic, ConfigLoadError, configError } from './diagnostics.ts';
+import { normalizeNetworkHost } from './network.ts';
 
 export const CONFIG_FILE_NAME = 'runtime-evidence.yaml' as const;
 
@@ -15,7 +16,9 @@ export const CONFIG_DEFAULTS_V1 = Object.freeze({
   network: Object.freeze({
     default: 'deny',
     allowHosts: Object.freeze([]),
+    allowDependencyHosts: Object.freeze([]),
   }),
+  sideEffects: Object.freeze({ allowStateChanging: false }),
   redaction: Object.freeze({
     headers: Object.freeze([
       'authorization',
@@ -66,6 +69,8 @@ export interface LoadedConfigV1 {
   readonly config: EffectiveConfigV1;
   /** SHA-256 of the canonical effective config with environment references left unresolved. */
   readonly configHash: string;
+  /** Target identifiers safe for evidence; environment-derived URLs remain references. */
+  readonly evidenceTargets: Readonly<Record<'baseline' | 'candidate', string>>;
   readonly path: string;
 }
 
@@ -275,6 +280,36 @@ function assertNoInlineSecrets(config: ConfigV1, configPath: string): void {
   }
 }
 
+function assertNetworkAllowLists(config: ConfigV1, configPath: string): void {
+  for (const [field, hosts] of [
+    ['allowHosts', config.network.allowHosts],
+    ['allowDependencyHosts', config.network.allowDependencyHosts ?? []],
+  ] as const) {
+    const normalizedHosts = new Set<string>();
+    for (const [index, host] of hosts.entries()) {
+      const normalized = normalizeNetworkHost(host);
+      const path = `/network/${field}/${index}`;
+      if (normalized === undefined) {
+        throw configError(
+          'CONFIG_VALIDATION_FAILED',
+          'Network allowlist entries must be hostname-only values without ports or wildcards.',
+          path,
+          configPath,
+        );
+      }
+      if (normalizedHosts.has(normalized)) {
+        throw configError(
+          'CONFIG_VALIDATION_FAILED',
+          'Network allowlist entries must be unique after normalization.',
+          path,
+          configPath,
+        );
+      }
+      normalizedHosts.add(normalized);
+    }
+  }
+}
+
 function resolveReference(
   value: string | { env: string },
   environment: Readonly<Record<string, string | undefined>>,
@@ -306,6 +341,7 @@ function resolveTarget(
   const headers = target.headers;
   return {
     url: resolveReference(target.url, environment, `${path}/url`, configPath),
+    ...(target.isolation === undefined ? {} : { isolation: target.isolation }),
     ...(headers === undefined
       ? {}
       : {
@@ -346,6 +382,28 @@ function resolveEnvironment(
       ),
     },
   };
+}
+
+function evidenceTargetUrl(target: ConfigV1['targets']['baseline']): string {
+  if (typeof target.url !== 'string') {
+    return '[environment reference]';
+  }
+  try {
+    const url = new URL(target.url);
+    if (
+      (url.protocol === 'http:' || url.protocol === 'https:') &&
+      url.username === '' &&
+      url.password === '' &&
+      url.pathname === '/' &&
+      url.search === '' &&
+      url.hash === ''
+    ) {
+      return url.origin;
+    }
+  } catch {
+    // The generic marker below cannot expose malformed target input.
+  }
+  return '[invalid target]';
 }
 
 function isMissingFileError(error: unknown): boolean {
@@ -451,10 +509,15 @@ export async function loadConfig(options: LoadConfigOptions = {}): Promise<Loade
   }
 
   assertNoInlineSecrets(merged, configPath);
+  assertNetworkAllowLists(merged, configPath);
 
   return {
     config: resolveEnvironment(merged, options.environment ?? process.env, configPath),
     configHash: hashConfig(merged),
+    evidenceTargets: {
+      baseline: evidenceTargetUrl(merged.targets.baseline),
+      candidate: evidenceTargetUrl(merged.targets.candidate),
+    },
     path: configPath,
   };
 }

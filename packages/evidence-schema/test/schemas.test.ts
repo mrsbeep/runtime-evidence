@@ -24,7 +24,10 @@ const fixtureSets: readonly FixtureSet[] = [
     name: 'config-v1',
     schema: ConfigSchemaV1,
     schemaFile: 'config-v1.json',
-    validFixtures: ['fixtures/config/valid/minimal.json'],
+    validFixtures: [
+      'fixtures/config/valid/minimal.json',
+      'fixtures/config/valid/pre-policy-v1.json',
+    ],
     invalidFixtures: [
       'fixtures/config/invalid/unknown-network-field.json',
       'fixtures/config/invalid/wrong-version.json',

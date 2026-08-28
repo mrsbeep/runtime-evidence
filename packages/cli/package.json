@@ -23,6 +23,7 @@
     "@runtime-evidence/capture-http": "0.0.0",
     "@runtime-evidence/config": "0.0.0",
     "@runtime-evidence/evidence-schema": "0.0.0",
+    "@runtime-evidence/orchestrator": "0.0.0",
     "@runtime-evidence/reporter-junit": "0.0.0",
     "@runtime-evidence/reporter-markdown": "0.0.0"
   }
