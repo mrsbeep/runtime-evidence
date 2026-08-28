@@ -88,7 +88,16 @@ function assertDifference(
 }
 
 function assertInfrastructureError(evidence: EvidenceV1 | undefined, code: string): void {
-  assert.ok(evidence?.infrastructureErrors.some((message) => message.includes(code)));
+  const receivedCodes = (evidence?.infrastructureErrors ?? []).map((message) => {
+    const candidate = message.split(': ', 4)[2];
+    return candidate !== undefined && /^[A-Z][A-Z0-9_]+$/.test(candidate)
+      ? candidate
+      : '[unavailable]';
+  });
+  assert.ok(
+    receivedCodes.includes(code),
+    `Expected infrastructure code ${code}; received ${receivedCodes.join(', ') || 'none'}.`,
+  );
   assert.notEqual(evidence?.state, 'pass');
 }
 
