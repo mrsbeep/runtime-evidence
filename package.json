@@ -18,9 +18,11 @@
     "generate:schemas": "npm run generate --workspace @runtime-evidence/evidence-schema",
     "example:node-http": "node examples/node-http/run-example.ts",
     "lint": "biome lint .",
-    "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present && npm run test:examples",
+    "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present && npm run test:examples && npm run test:acceptance",
+    "test:acceptance": "node --test tests/acceptance/v0.1.test.ts",
     "test:examples": "npm run example:node-http -- smoke",
-    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present"
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present",
+    "verify:acceptance-diagnostics": "node scripts/verify-acceptance-diagnostics.ts"
   },
   "engines": {
     "node": ">=22.18.0",
