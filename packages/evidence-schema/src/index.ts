@@ -1,4 +1,5 @@
 export { ConfigSchemaV1, type ConfigV1 } from './config.ts';
+export { canonicalizeJson } from './canonical-json.ts';
 export {
   EvidenceArtifactError,
   type EvidenceArtifactErrorCode,

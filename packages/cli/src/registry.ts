@@ -1,9 +1,10 @@
 import type { CliCommandDefinition } from './command-definition.ts';
+import { captureCommand } from './commands/capture.ts';
 import { doctorCommand } from './commands/doctor.ts';
 import { initCommand } from './commands/init.ts';
 import { reportCommand } from './commands/report.ts';
 import { schemaCommand } from './commands/schema.ts';
-import { captureCommand, verifyCommand } from './commands/unavailable.ts';
+import { verifyCommand } from './commands/unavailable.ts';
 import type { CliCommandHandler, CliCommandName } from './types.ts';
 
 const definitions: readonly CliCommandDefinition[] = [
@@ -38,17 +39,23 @@ const definitions: readonly CliCommandDefinition[] = [
     name: 'capture',
     options: [
       { description: 'Configuration file.', kind: 'string', name: 'config', valueName: 'path' },
-      { description: 'Capture input.', kind: 'string', name: 'input', valueName: 'path' },
       {
-        description: 'Evidence output directory.',
+        description: 'Raw capture JSON to sanitize in memory.',
+        kind: 'string',
+        name: 'input',
+        required: true,
+        valueName: 'path',
+      },
+      {
+        description: 'Scenario output directory (default: scenarios).',
         kind: 'string',
         name: 'output',
         valueName: 'path',
       },
-      { description: 'Confirm non-interactive capture.', kind: 'boolean', name: 'yes' },
+      { description: 'Persist the sanitized preview.', kind: 'boolean', name: 'yes' },
     ],
-    summary: 'Capture baseline behavior as evidence.',
-    usage: 'runtime-evidence capture [options]',
+    summary: 'Sanitize one HTTP request into a scenario candidate.',
+    usage: 'runtime-evidence capture --input <path> [options]',
   },
   {
     handler: verifyCommand,

@@ -2,12 +2,6 @@ import { incompleteResult, invalidInputResult } from '../diagnostics.ts';
 import { stringOption } from '../options.ts';
 import type { CliCommandHandler } from '../types.ts';
 
-export const captureCommand: CliCommandHandler = () =>
-  incompleteResult(
-    'CLI_CAPTURE_INCOMPLETE',
-    'Capture is unavailable until required redaction enforcement is implemented.',
-  );
-
 export const verifyCommand: CliCommandHandler = (context) => {
   const totalTimeout = stringOption(context.options, 'total-timeout-ms');
   if (

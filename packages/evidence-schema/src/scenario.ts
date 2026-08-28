@@ -13,6 +13,19 @@ const Provenance = Type.Object(
     source: Type.Enum(['hand-authored', 'har', 'openapi', 'local-capture', 'test-adapter']),
     reference: Type.Optional(NonEmptyString),
     sha256: Type.Optional(Sha256Digest),
+    redaction: Type.Optional(
+      Type.Object(
+        {
+          applied: Type.Literal(true),
+          rules: Type.Array(NonEmptyString, { uniqueItems: true }),
+          valuesRemoved: Type.Integer({ minimum: 0 }),
+        },
+        {
+          additionalProperties: false,
+          description: 'Sanitization applied before a captured scenario reached persistence.',
+        },
+      ),
+    ),
   },
   { additionalProperties: false },
 );

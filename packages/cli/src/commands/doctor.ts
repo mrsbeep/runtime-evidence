@@ -2,27 +2,8 @@ import { ConfigLoadError, loadConfig } from '@runtime-evidence/config';
 
 import { infrastructureResult } from '../diagnostics.ts';
 import { stringOption } from '../options.ts';
-import type { CliCommandHandler, CliCommandResult } from '../types.ts';
-
-function configFailure(error: ConfigLoadError): CliCommandResult {
-  const diagnostics = error.diagnostics.map((diagnostic) => ({
-    code: diagnostic.code,
-    message: diagnostic.message,
-    path: diagnostic.path,
-  }));
-  if (error.code === 'CONFIG_READ_FAILED') {
-    return {
-      ...infrastructureResult(error.code, error.message),
-      diagnostics,
-    };
-  }
-  return {
-    code: error.code,
-    diagnostics,
-    message: error.message,
-    status: 'invalid-input',
-  };
-}
+import type { CliCommandHandler } from '../types.ts';
+import { configFailureResult } from './config-failure.ts';
 
 export const doctorCommand: CliCommandHandler = async (context) => {
   context.progress('Validating configuration and local prerequisites.');
@@ -52,7 +33,7 @@ export const doctorCommand: CliCommandHandler = async (context) => {
     };
   } catch (error) {
     return error instanceof ConfigLoadError
-      ? configFailure(error)
+      ? configFailureResult(error)
       : infrastructureResult('CLI_DOCTOR_FAILED', 'Local prerequisite checks could not complete.');
   }
 };

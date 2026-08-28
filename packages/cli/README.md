@@ -7,7 +7,7 @@ The `runtime-evidence` CLI provides deterministic local commands, structured exi
 ```text
 runtime-evidence init --yes [--directory <path>] [--project <name>] [--force]
 runtime-evidence doctor [--config <path>]
-runtime-evidence capture [--config <path>] [--input <path>] [--output <path>] [--yes]
+runtime-evidence capture --input <path> [--config <path>] [--output <path>] [--yes]
 runtime-evidence verify [--config <path>] [--scenario <id>...] [--output <path>] [--total-timeout-ms <ms>]
 runtime-evidence report --input <path> [--format json|markdown|junit] [--output <path>]
 runtime-evidence schema --kind config|scenario|evidence
@@ -20,6 +20,8 @@ Examples:
 ```sh
 runtime-evidence init --yes --project checkout-api
 runtime-evidence doctor --json
+runtime-evidence capture --input capture.json
+runtime-evidence capture --input capture.json --output scenarios --yes
 runtime-evidence report --input evidence.json --format junit --output evidence.junit.xml
 runtime-evidence schema --kind evidence
 ```
@@ -38,6 +40,6 @@ Interrupted and incomplete execution can never produce exit code `0`. Error mess
 
 ## v0.1 safety boundary
 
-`init`, `doctor`, `report`, and `schema` are functional. The `capture` and `verify` command surfaces are reserved, but currently exit with code `3` until their required redaction and outbound-network enforcement is implemented. This fail-closed behavior prevents an unfinished implementation from claiming a pass.
+`init`, `doctor`, `capture`, `report`, and `schema` are functional. Capture is preview-only unless `--yes` is supplied: raw input remains in memory, the sanitized preview is emitted before saving, and an existing scenario is never replaced. `verify` currently exits with code `3` until outbound-network enforcement is implemented. This fail-closed behavior prevents unfinished policy enforcement from claiming a pass.
 
 The CLI performs no telemetry or network reporting. It does not persist resolved secret values, and `doctor` reports only safe configuration metadata.
