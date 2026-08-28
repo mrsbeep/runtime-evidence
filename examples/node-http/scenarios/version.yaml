@@ -1,0 +1,12 @@
+schemaVersion: 1
+id: "node-http-version"
+name: "Compare the service version"
+description: "Detect a candidate response version that differs from the baseline."
+provenance:
+  source: "hand-authored"
+safety:
+  classification: "read-only"
+  rationale: "This GET request reads a disposable local service without changing state."
+request:
+  method: "GET"
+  path: "/version"

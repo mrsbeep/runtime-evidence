@@ -1,0 +1,19 @@
+schemaVersion: 1
+project:
+  name: "node-http-quickstart"
+targets:
+  baseline:
+    url:
+      env: "RUNTIME_EVIDENCE_EXAMPLE_BASELINE_URL"
+  candidate:
+    url:
+      env: "RUNTIME_EVIDENCE_EXAMPLE_CANDIDATE_URL"
+scenarios:
+  include:
+    - "scenarios/version.yaml"
+network:
+  default: "deny"
+  allowHosts:
+    - "127.0.0.1"
+comparison:
+  maxLatencyRegressionPercent: 1000000000
