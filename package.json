@@ -16,8 +16,10 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "generate:schemas": "npm run generate --workspace @runtime-evidence/evidence-schema",
+    "example:node-http": "node examples/node-http/run-example.ts",
     "lint": "biome lint .",
-    "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present",
+    "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present && npm run test:examples",
+    "test:examples": "npm run example:node-http -- smoke",
     "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present"
   },
   "engines": {
