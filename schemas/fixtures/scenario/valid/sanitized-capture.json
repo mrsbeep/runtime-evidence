@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "create-order",
+  "name": "Create an order",
+  "provenance": {
+    "source": "local-capture",
+    "sha256": "6ab6966255346c543c30cb61d1568e6f88764a1f4d3d13bc022165ccbe3d0a1b",
+    "redaction": {
+      "applied": true,
+      "rules": ["header:authorization", "jsonpath:$.customer.ssn"],
+      "valuesRemoved": 2
+    }
+  },
+  "safety": {
+    "classification": "mocked",
+    "rationale": "Runs only against the disposable local example."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/orders",
+    "headers": {
+      "authorization": {
+        "env": "RUNTIME_EVIDENCE_CREATE_ORDER_0F8C8BE5_HEADER_AUTHORIZATION_CBB82EBE"
+      },
+      "content-type": "application/json"
+    },
+    "body": {
+      "customer": {
+        "ssn": "[REDACTED]"
+      },
+      "sku": "example-item"
+    }
+  }
+}

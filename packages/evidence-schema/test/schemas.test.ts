@@ -34,7 +34,10 @@ const fixtureSets: readonly FixtureSet[] = [
     name: 'scenario-v1',
     schema: ScenarioSchemaV1,
     schemaFile: 'scenario-v1.json',
-    validFixtures: ['fixtures/scenario/valid/health-check.json'],
+    validFixtures: [
+      'fixtures/scenario/valid/health-check.json',
+      'fixtures/scenario/valid/sanitized-capture.json',
+    ],
     invalidFixtures: ['fixtures/scenario/invalid/missing-safety.json'],
   },
   {

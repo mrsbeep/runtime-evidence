@@ -40,6 +40,30 @@
         "sha256": {
           "type": "string",
           "pattern": "^[a-f0-9]{64}$"
+        },
+        "redaction": {
+          "type": "object",
+          "required": ["applied", "rules", "valuesRemoved"],
+          "properties": {
+            "applied": {
+              "type": "boolean",
+              "const": true
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "valuesRemoved": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sanitization applied before a captured scenario reached persistence."
         }
       },
       "additionalProperties": false

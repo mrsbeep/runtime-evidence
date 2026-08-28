@@ -143,6 +143,7 @@ test('argument errors are deterministic and machine-readable', async () => {
     [['--json'], 'CLI_COMMAND_REQUIRED'],
     [['unknown', '--json'], 'CLI_COMMAND_UNKNOWN'],
     [['doctor', '--unknown', '--json'], 'CLI_OPTION_UNKNOWN'],
+    [['capture', '--json'], 'CLI_OPTION_REQUIRED'],
     [['report', '--json'], 'CLI_OPTION_REQUIRED'],
     [['schema', '--kind', 'nope', '--json'], 'CLI_OPTION_INVALID'],
     [['verify', '--total-timeout-ms', '0', '--json'], 'CLI_OPTION_INVALID'],
@@ -183,14 +184,12 @@ test('an invalid runtime handler override fails closed', async () => {
   assert.equal(parseOnlyEnvelope(harness).code, 'CLI_HANDLER_UNAVAILABLE');
 });
 
-test('capture and verify fail closed until their enforcement dependencies land', async () => {
-  for (const command of ['capture', 'verify'] as const) {
-    const harness = createHarness();
-    const result = await runCli([command, '--json'], { io: harness.io });
-    const envelope = parseOnlyEnvelope(harness);
-    assert.equal(result.exitCode, 3);
-    assert.equal(envelope.status, 'incomplete');
-  }
+test('verify fails closed until its enforcement dependencies land', async () => {
+  const harness = createHarness();
+  const result = await runCli(['verify', '--json'], { io: harness.io });
+  const envelope = parseOnlyEnvelope(harness);
+  assert.equal(result.exitCode, 3);
+  assert.equal(envelope.status, 'incomplete');
 });
 
 test('init creates a valid fail-closed config and refuses accidental replacement', async (context) => {
@@ -240,6 +239,69 @@ test('doctor returns safe config metadata without resolved target values', async
   assert.equal(result.exitCode, 0);
   assert.equal((envelope.data as { project: string }).project, 'doctor-test');
   assert.doesNotMatch(harness.stdout.join(''), /127\.0\.0\.1:4[12]00/);
+});
+
+test('capture previews before saving and never emits or persists raw secrets', async (context) => {
+  const directory = await temporaryDirectory(context);
+  const inputPath = join(directory, 'capture.json');
+  const outputDirectory = join(directory, 'captured-scenarios');
+  const scenarioPath = join(outputDirectory, 'create-order.yaml');
+  const representativeSecret = 'not-a-real-capture-secret-value';
+  await runCli(['init', '--yes', '--directory', directory], {
+    cwd: directory,
+    io: createHarness().io,
+  });
+  await writeFile(inputPath, Buffer.from([0xff]));
+  const invalidEncodingHarness = createHarness();
+  const invalidEncoding = await runCli(['capture', '--input', inputPath, '--json'], {
+    cwd: directory,
+    io: invalidEncodingHarness.io,
+  });
+  assert.equal(invalidEncoding.exitCode, 2);
+  assert.equal(parseOnlyEnvelope(invalidEncodingHarness).code, 'CLI_CAPTURE_INPUT_INVALID');
+
+  await writeFile(
+    inputPath,
+    JSON.stringify({
+      id: 'create-order',
+      name: 'Create an order',
+      safety: { classification: 'mocked', rationale: 'Disposable local target.' },
+      request: {
+        method: 'POST',
+        path: '/orders',
+        headers: { authorization: `Bearer ${representativeSecret}` },
+        body: { password: representativeSecret, sku: 'example-item' },
+      },
+    }),
+    'utf8',
+  );
+
+  const previewHarness = createHarness();
+  const preview = await runCli(
+    ['capture', '--input', inputPath, '--output', outputDirectory, '--json'],
+    { cwd: directory, io: previewHarness.io },
+  );
+  assert.equal(preview.exitCode, 3);
+  assert.equal(parseOnlyEnvelope(previewHarness).code, 'CLI_CAPTURE_CONFIRMATION_REQUIRED');
+  assert.doesNotMatch(
+    `${previewHarness.stdout.join('')} ${previewHarness.stderr.join('')}`,
+    new RegExp(representativeSecret),
+  );
+  await assert.rejects(readFile(scenarioPath, 'utf8'));
+
+  const saveHarness = createHarness();
+  const saved = await runCli(
+    ['capture', '--input', inputPath, '--output', outputDirectory, '--yes', '--json'],
+    { cwd: directory, io: saveHarness.io },
+  );
+  const savedContent = await readFile(scenarioPath, 'utf8');
+  assert.equal(saved.exitCode, 0);
+  assert.equal(parseOnlyEnvelope(saveHarness).code, 'CLI_CAPTURE_SAVED');
+  assert.doesNotMatch(
+    `${saveHarness.stdout.join('')} ${saveHarness.stderr.join('')} ${savedContent}`,
+    new RegExp(representativeSecret),
+  );
+  assert.equal(JSON.parse(savedContent).provenance.redaction.applied, true);
 });
 
 test('schema emits the requested versioned schema', async () => {
