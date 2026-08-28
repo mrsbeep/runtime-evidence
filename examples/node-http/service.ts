@@ -40,9 +40,11 @@ export function startExampleService(version: number): Promise<ExampleService> {
       server.removeListener('error', rejectPromise);
       const address = server.address();
       if (address === null || typeof address === 'string') {
-        void closeServer(server).finally(() => {
-          rejectPromise(new Error('Example service did not receive a TCP address.'));
-        });
+        const addressError = new Error('Example service did not receive a TCP address.');
+        void closeServer(server).then(
+          () => rejectPromise(addressError),
+          (closeError: unknown) => rejectPromise(closeError),
+        );
         return;
       }
 

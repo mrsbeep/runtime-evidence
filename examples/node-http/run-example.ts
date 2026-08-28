@@ -75,8 +75,11 @@ function assertExpectedEvidence(
   if (exampleCase === 'pass' && differencePaths.length > 0) {
     throw new Error('The passing example produced an unexpected difference.');
   }
-  if (exampleCase === 'fail' && !differencePaths.includes(EXPECTED_DIFFERENCE_PATH)) {
-    throw new Error(`The failing example did not report ${EXPECTED_DIFFERENCE_PATH}.`);
+  if (
+    exampleCase === 'fail' &&
+    (differencePaths.length !== 1 || differencePaths[0] !== EXPECTED_DIFFERENCE_PATH)
+  ) {
+    throw new Error(`The failing example did not report only ${EXPECTED_DIFFERENCE_PATH}.`);
   }
 }
 
