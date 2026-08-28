@@ -204,6 +204,37 @@ test('unsafe runtime input fails with stable diagnostics that never read or echo
   );
 });
 
+test('fails closed when header names or request paths contain known secret formats', () => {
+  const headerError = expectCaptureError(
+    () =>
+      prepareSanitizedCapture(
+        {
+          ...captureInput,
+          request: {
+            ...captureInput.request,
+            headers: { [secrets.aws]: 'example-value' },
+          },
+        },
+        policy,
+      ),
+    'CAPTURE_REDACTION_FAILED',
+  );
+  assert.equal(headerError.path, '/request/headers');
+
+  const pathError = expectCaptureError(
+    () =>
+      prepareSanitizedCapture(
+        {
+          ...captureInput,
+          request: { ...captureInput.request, path: `/orders/${secrets.github}` },
+        },
+        policy,
+      ),
+    'CAPTURE_REDACTION_FAILED',
+  );
+  assert.equal(pathError.path, '/request/path');
+});
+
 test('interruption prevents a sanitized scenario from reaching persistence', async (context) => {
   const outputDirectory = await temporaryDirectory(context);
   const controller = new AbortController();

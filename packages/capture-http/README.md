@@ -37,6 +37,7 @@ The in-memory input is JSON with explicit scenario identity and safety metadata:
 - Sensitive query and JSON field names become `[REDACTED]`.
 - Configured JSON paths replace the selected subtree with `[REDACTED]`.
 - Bearer and Basic credentials, private keys, JWTs, GitHub tokens, AWS access keys, and common secret assignments are removed from other strings.
+- Header names and request paths that match a known secret format fail closed because redacting them would change request semantics or persist part of the secret.
 - Invalid input, unsupported JSON paths, unsafe object keys, or any redaction uncertainty prevents persistence with a stable safe diagnostic.
 
 The supported deterministic JSON-path subset is `$`, dot properties such as `$.customer.ssn`, quoted properties such as `$["account.id"]`, and array indexes such as `$.items[0]`. Wildcards, filters, recursive descent, and scripts are rejected.

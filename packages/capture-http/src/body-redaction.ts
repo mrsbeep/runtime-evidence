@@ -74,7 +74,7 @@ function sanitizeJsonValue(value: unknown, state: RedactionState): unknown {
     Object.entries(value)
       .sort(([left], [right]) => compareCodeUnits(left, right))
       .map(([key, item]) => {
-        assertSafeFieldKey(key);
+        assertSafeFieldKey(key, '/request/body');
         if (isSensitiveFieldName(key) && item !== REDACTED_CAPTURE_VALUE) {
           recordRedaction(state, `json-key:${key.toLowerCase()}`);
           return [key, REDACTED_CAPTURE_VALUE];

@@ -71,7 +71,10 @@ export function sanitizeHeaders(
   const sensitive = configuredSensitiveHeaders(policy.headers);
   return Object.fromEntries(
     Object.entries(headers ?? {})
-      .map(([name, value]) => [name.toLowerCase(), value] as const)
+      .map(([name, value]) => {
+        assertSafeFieldKey(name, '/request/headers');
+        return [name.toLowerCase(), value] as const;
+      })
       .sort(([left], [right]) => compareCodeUnits(left, right))
       .map(([name, value]) => {
         if (sensitive.has(name) || isSensitiveFieldName(name)) {
@@ -92,7 +95,7 @@ export function sanitizeQuery(
     Object.entries(query ?? {})
       .sort(([left], [right]) => compareCodeUnits(left, right))
       .map(([name, value]) => {
-        assertSafeFieldKey(name);
+        assertSafeFieldKey(name, '/request/query');
         if (isSensitiveFieldName(name)) {
           recordRedaction(state, `query:${name.toLowerCase()}`);
           return [name, REDACTED_CAPTURE_VALUE];

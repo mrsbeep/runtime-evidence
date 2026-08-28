@@ -38,6 +38,13 @@ export function redactCapture(
       '/id',
     );
   }
+  if (containsKnownSecret(input.request.path)) {
+    throw captureError(
+      'CAPTURE_REDACTION_FAILED',
+      'Capture request path matched a secret format and could not be persisted safely.',
+      '/request/path',
+    );
+  }
 
   const state = createRedactionState();
   const body = sanitizeBody(input.request.body, policy.jsonPaths, state);

@@ -74,11 +74,12 @@ export function isSensitiveFieldName(value: string): boolean {
   return sensitiveFieldName.test(separated);
 }
 
-export function assertSafeFieldKey(key: string): void {
+export function assertSafeFieldKey(key: string, path = '/'): void {
   if (containsKnownSecret(key)) {
     throw captureError(
       'CAPTURE_REDACTION_FAILED',
       'A capture field name matched a secret format and could not be persisted safely.',
+      path,
     );
   }
 }
