@@ -17,11 +17,16 @@ const expectedPackages: readonly string[] = [
 ];
 
 interface PackageManifest {
+  readonly exports?: Readonly<Record<string, unknown>>;
+  readonly files?: readonly string[];
   readonly license?: string;
+  readonly main?: string;
   readonly name?: string;
   readonly private?: boolean;
+  readonly publishConfig?: Readonly<{ access?: string }>;
   readonly scripts?: Readonly<Record<string, string>>;
   readonly type?: string;
+  readonly types?: string;
   readonly version?: string;
 }
 
@@ -45,7 +50,7 @@ async function findJavaScriptFiles(directory: string): Promise<string[]> {
   return matches;
 }
 
-test('workspace package manifests are private and buildable', async (context) => {
+test('workspace package manifests are buildable and configured for npm publication', async (context) => {
   const packageDirectories = (await readdir('packages', { withFileTypes: true }))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
@@ -60,12 +65,16 @@ test('workspace package manifests are private and buildable', async (context) =>
       ) as PackageManifest;
 
       assert.equal(manifest.name, `@runtime-evidence/${packageName}`);
-      assert.equal(manifest.version, '0.0.0');
-      assert.equal(manifest.private, true);
+      assert.equal(manifest.version, '0.1.0');
+      assert.equal(manifest.private, undefined);
       assert.equal(manifest.license, 'Apache-2.0');
       assert.equal(manifest.type, 'module');
-      assert.equal(manifest.scripts?.build, 'tsc -p tsconfig.json');
-      assert.equal(manifest.scripts?.typecheck, 'tsc -p tsconfig.json --noEmit');
+      assert.equal(manifest.main, './dist/index.js');
+      assert.equal(manifest.types, './dist/index.d.ts');
+      assert.deepEqual(manifest.files, ['dist', '!dist/.tsbuildinfo', '!dist/**/*.tsbuildinfo']);
+      assert.equal(manifest.publishConfig?.access, 'public');
+      assert.equal(manifest.scripts?.build, 'tsc -b');
+      assert.equal(manifest.scripts?.typecheck, 'tsc -b');
     });
   }
 });

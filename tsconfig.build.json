@@ -1,0 +1,15 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/capture-http" },
+    { "path": "packages/cli" },
+    { "path": "packages/comparators" },
+    { "path": "packages/config" },
+    { "path": "packages/evidence-schema" },
+    { "path": "packages/orchestrator" },
+    { "path": "packages/plugin-sdk" },
+    { "path": "packages/replay-http" },
+    { "path": "packages/reporter-junit" },
+    { "path": "packages/reporter-markdown" }
+  ]
+}

@@ -102,7 +102,7 @@ test('JSON help and version envelopes include their requested content', async ()
 
   const versionHarness = createHarness();
   await runCli(['--version', '--json'], { io: versionHarness.io });
-  assert.equal((parseOnlyEnvelope(versionHarness).data as { version: string }).version, '0.0.0');
+  assert.equal((parseOnlyEnvelope(versionHarness).data as { version: string }).version, '0.1.0');
 });
 
 test('JSON mode keeps its single envelope separate from progress', async () => {

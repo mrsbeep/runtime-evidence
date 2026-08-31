@@ -1,18 +1,40 @@
 {
   "name": "@runtime-evidence/evidence-schema",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Canonical evidence types and validation for runtime-evidence",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo",
+    "!dist/**/*.tsbuildinfo"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrsbeep/runtime-evidence.git",
+    "directory": "packages/evidence-schema"
+  },
+  "homepage": "https://github.com/mrsbeep/runtime-evidence#readme",
+  "bugs": {
+    "url": "https://github.com/mrsbeep/runtime-evidence/issues"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -b",
     "generate": "node src/generate.ts && biome format --write ../../schemas/config-v1.json ../../schemas/scenario-v1.json ../../schemas/evidence-v1.json",
     "test": "tsc -p tsconfig.test.json --noEmit && node --test test/schemas.test.ts test/artifact.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -b"
   },
   "engines": {
     "node": ">=22.18.0"
