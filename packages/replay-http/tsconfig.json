@@ -6,5 +6,6 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
+  "references": [{ "path": "../evidence-schema" }],
   "include": ["src/**/*.ts"]
 }

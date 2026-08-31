@@ -6,5 +6,11 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
+  "references": [
+    { "path": "../comparators" },
+    { "path": "../config" },
+    { "path": "../evidence-schema" },
+    { "path": "../replay-http" }
+  ],
   "include": ["src/**/*.ts"]
 }

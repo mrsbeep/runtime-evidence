@@ -6,5 +6,13 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
+  "references": [
+    { "path": "../capture-http" },
+    { "path": "../config" },
+    { "path": "../evidence-schema" },
+    { "path": "../orchestrator" },
+    { "path": "../reporter-junit" },
+    { "path": "../reporter-markdown" }
+  ],
   "include": ["src/**/*.ts"]
 }

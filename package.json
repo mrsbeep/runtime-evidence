@@ -1,6 +1,6 @@
 {
   "name": "runtime-evidence-workspace",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Runtime verification evidence for pull requests",
   "license": "Apache-2.0",
@@ -9,8 +9,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build --workspaces --if-present",
-    "check": "npm run check:scaffold && npm run format:check && npm run lint && npm run typecheck && npm run build && npm test",
+    "build": "npm run clean && tsc -b tsconfig.build.json",
+    "check": "npm run check:scaffold && npm run format:check && npm run lint && npm run typecheck && npm run build && npm test && npm run verify:pack",
     "check:scaffold": "node scripts/check-scaffold.ts",
     "clean": "node scripts/clean.ts",
     "format": "biome format --write .",
@@ -18,11 +18,13 @@
     "generate:schemas": "npm run generate --workspace @runtime-evidence/evidence-schema",
     "example:node-http": "node examples/node-http/run-example.ts",
     "lint": "biome lint .",
+    "publish:dry-run": "npm publish --dry-run --workspaces",
     "test": "node --test tests/workspace.test.ts && npm run test --workspaces --if-present && npm run test:examples && npm run test:acceptance",
     "test:acceptance": "node --test tests/acceptance/v0.1.test.ts",
     "test:examples": "npm run example:node-http -- smoke",
-    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present",
-    "verify:acceptance-diagnostics": "node scripts/verify-acceptance-diagnostics.ts"
+    "typecheck": "tsc -b tsconfig.build.json && tsc -p tsconfig.json --noEmit",
+    "verify:acceptance-diagnostics": "node scripts/verify-acceptance-diagnostics.ts",
+    "verify:pack": "node scripts/verify-pack.ts"
   },
   "engines": {
     "node": ">=22.18.0",

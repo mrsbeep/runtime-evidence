@@ -171,7 +171,9 @@ const requiredPaths: readonly string[] = [
   'scripts/clean.ts',
   'scripts/check-scaffold.ts',
   'scripts/verify-acceptance-diagnostics.ts',
+  'scripts/verify-pack.ts',
   'tests/workspace.test.ts',
+  'tsconfig.build.json',
   'tsconfig.json',
   ...workspacePackages.flatMap((packageName) => [
     `packages/${packageName}/package.json`,
@@ -198,6 +200,7 @@ const jsonPaths = [
   'biome.json',
   'package.json',
   'tsconfig.base.json',
+  'tsconfig.build.json',
   'tsconfig.json',
   ...workspacePackages.flatMap((packageName) => [
     `packages/${packageName}/package.json`,

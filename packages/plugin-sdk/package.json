@@ -1,13 +1,38 @@
 {
   "name": "@runtime-evidence/plugin-sdk",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Plugin contracts and helpers for runtime-evidence",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo",
+    "!dist/**/*.tsbuildinfo"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrsbeep/runtime-evidence.git",
+    "directory": "packages/plugin-sdk"
+  },
+  "homepage": "https://github.com/mrsbeep/runtime-evidence#readme",
+  "bugs": {
+    "url": "https://github.com/mrsbeep/runtime-evidence/issues"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build": "tsc -b",
+    "typecheck": "tsc -b"
   },
   "engines": {
     "node": ">=22.18.0"
