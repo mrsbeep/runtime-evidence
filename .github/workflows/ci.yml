@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload acceptance diagnostics
         if: always() && steps.acceptance_diagnostics.outcome == 'success'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: acceptance-diagnostics-node-22
           path: .runtime-evidence/acceptance/diagnostics.json
@@ -77,7 +77,7 @@ jobs:
 
       - name: Upload acceptance diagnostics
         if: always() && steps.acceptance_diagnostics.outcome == 'success'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: acceptance-diagnostics-node-current
           path: .runtime-evidence/acceptance/diagnostics.json
